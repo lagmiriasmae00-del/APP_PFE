@@ -1,19 +1,38 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, CheckCircle2, XCircle, Trophy, RefreshCcw, Home } from 'lucide-react';
-import quizzesData from '../data/quizzes.json';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useAppContext } from '../context/AppContext';
+import { api } from '../services/api';
+import { motion } from 'framer-motion';
+import Button from '../components/ui/Button';
 
 export default function Quiz() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const questions = quizzesData[id] || [];
+  const { saveExamScore } = useAppContext();
   
+  const [questions, setQuestions] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [score, setScore] = useState(0);
   const [showResult, setShowResult] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
   const [isAnswered, setIsAnswered] = useState(false);
+
+  useEffect(() => {
+    const fetchQuiz = async () => {
+      try {
+        const quizData = await api.getQuizById(id);
+        setQuestions(quizData || []);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchQuiz();
+  }, [id]);
 
   const handleOptionSelect = (index) => {
     if (isAnswered) return;
@@ -22,7 +41,7 @@ export default function Quiz() {
 
   const handleVerify = () => {
     const correct = questions[currentQuestion].answer === selectedOption;
-    if (correct) setScore(score + 1);
+    if (correct) setScore(prev => prev + 1);
     setIsAnswered(true);
   };
 
@@ -33,6 +52,11 @@ export default function Quiz() {
       setIsAnswered(false);
     } else {
       setShowResult(true);
+      // score state might be stale if verify was just clicked, but the user clicks Verify, THEN Next.
+      // So score is already updated.
+      const finalScore = score;
+      const pct = Math.round((finalScore / questions.length) * 100);
+      saveExamScore(id, pct);
     }
   };
 
@@ -44,6 +68,12 @@ export default function Quiz() {
      setIsAnswered(false);
   };
 
+  if (loading) return (
+    <div className="flex justify-center items-center h-64">
+      <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-600"></div>
+    </div>
+  );
+
   if (!questions.length) return <div>Quiz introuvable</div>;
 
   if (showResult) {
@@ -51,7 +81,7 @@ export default function Quiz() {
     const passed = pct >= 70;
 
     return (
-      <div className="min-h-[80vh] flex items-center justify-center p-6 text-inter">
+      <div className="min-h-[80vh] flex items-center justify-center p-6 font-inter">
         <motion.div 
            initial={{ scale: 0.8, opacity: 0 }}
            animate={{ scale: 1, opacity: 1 }}
@@ -68,19 +98,13 @@ export default function Quiz() {
              Vous avez obtenu {score} / {questions.length} ({pct}%)
            </p>
 
-           <div className="space-y-4">
-              <button 
-                onClick={restartQuiz} 
-                className="w-full py-4 bg-primary-600 text-white rounded-2xl font-bold shadow-3d-info hover:bg-primary-500 active:translate-y-1 active:shadow-none flex items-center justify-center gap-2"
-              >
+           <div className="space-y-4 flex flex-col items-center">
+              <Button onClick={restartQuiz} className="w-full !py-4 flex gap-2">
                 <RefreshCcw size={20} /> Recommencer le quiz
-              </button>
-              <button 
-                onClick={() => navigate('/dashboard')} 
-                className="w-full py-4 bg-slate-100 text-slate-600 rounded-2xl font-bold shadow-3d-gray hover:bg-slate-200 active:translate-y-1 active:shadow-none flex items-center justify-center gap-2"
-              >
+              </Button>
+              <Button variant="secondary" onClick={() => navigate('/dashboard')} className="w-full !py-4 flex gap-2">
                 <Home size={20} /> Retour à l'accueil
-              </button>
+              </Button>
            </div>
         </motion.div>
       </div>
@@ -137,20 +161,21 @@ export default function Quiz() {
 
       <div className="pt-12 border-t border-slate-100">
          {!isAnswered ? (
-            <button 
+            <Button 
+              variant="success"
               disabled={selectedOption === null}
               onClick={handleVerify}
-              className="w-full py-5 bg-success text-white rounded-2xl font-bold font-outfit text-xl shadow-3d-success hover:bg-green-500 transition-all active:translate-y-1 active:shadow-none disabled:opacity-50 disabled:shadow-none disabled:bg-slate-200 disabled:text-slate-400"
+              className="w-full !py-5 font-outfit text-xl uppercase"
             >
-              VÉRIFIER
-            </button>
+              Vérifier
+            </Button>
          ) : (
-            <button 
+            <Button 
                onClick={handleNext}
-               className="w-full py-5 bg-primary-600 text-white rounded-2xl font-bold font-outfit text-xl shadow-3d-info hover:bg-primary-500 transition-all active:translate-y-1 active:shadow-none"
+               className="w-full !py-5 font-outfit text-xl uppercase"
             >
-               CONTINUER
-            </button>
+               Continuer
+            </Button>
          )}
       </div>
     </div>

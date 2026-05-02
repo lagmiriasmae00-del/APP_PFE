@@ -1,22 +1,47 @@
-import React from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Play, FileText, CheckCircle2, Trophy, HelpCircle } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
-import subjectsData from '../data/subjects.json';
+import { api } from '../services/api';
 import { motion } from 'framer-motion';
+import Button from '../components/ui/Button';
 
 export default function Module() {
   const { subId, modId } = useParams();
   const navigate = useNavigate();
-  const { progress } = useAppContext();
+  const { progress, examScores } = useAppContext();
   
-  const subject = subjectsData.find(s => s.id === subId);
-  const module = subject?.modules.find(m => m.id === modId);
+  const [subject, setSubject] = useState(null);
+  const [loading, setLoading] = useState(true);
 
+  useEffect(() => {
+    const fetchSubject = async () => {
+      try {
+        const data = await api.getSubjectById(subId);
+        setSubject(data);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchSubject();
+  }, [subId]);
+
+  if (loading) return (
+    <div className="flex justify-center items-center h-64">
+      <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-600"></div>
+    </div>
+  );
+
+  const module = subject?.modules.find(m => m.id === modId);
   if (!module) return <div>Module introuvable</div>;
 
+  const quizScore = examScores[module.quiz];
+  const allLessonsDone = module.lessons.every(l => progress[l.id]);
+
   return (
-    <div className="space-y-8 animate-in slide-in-from-bottom duration-500">
+    <div className="space-y-8 animate-in fade-in duration-500">
       <div className="flex items-center justify-between">
         <button 
           onClick={() => navigate(`/subject/${subId}`)}
@@ -47,13 +72,13 @@ export default function Module() {
                </h2>
                
                <div className="space-y-3">
-                  {module.lessons.map((lesson, index) => {
+                  {module.lessons.map((lesson) => {
                     const isCompleted = progress[lesson.id];
                     return (
                       <motion.div 
                         key={lesson.id}
                         whileHover={{ x: 10 }}
-                        className="flex items-center justify-between p-5 rounded-2xl bg-slate-50 hover:bg-white border-2 border-transparent hover:border-primary-100 transition-all cursor-pointer group shadow-sm active:translate-y-1"
+                        className={`flex items-center justify-between p-5 rounded-2xl transition-all cursor-pointer group border-2 ${isCompleted ? 'bg-white border-primary-100 shadow-sm' : 'bg-slate-50 border-transparent hover:border-primary-100'} active:translate-y-1`}
                         onClick={() => navigate(`/lesson/${subId}/${modId}/${lesson.id}`)}
                       >
                          <div className="flex items-center gap-4">
@@ -77,21 +102,41 @@ export default function Module() {
                  <Trophy size={24} className="text-warning" /> Quiz & Validation
                </h2>
                
-               <div className="bg-white rounded-3xl p-8 border-2 border-slate-100 shadow-xl flex flex-col items-center text-center">
-                  <div className="w-20 h-20 bg-warning/10 text-warning rounded-full flex items-center justify-center mb-6 border-4 border-warning/20">
-                     <HelpCircle size={40} />
-                  </div>
-                  <h4 className="text-2xl font-bold font-outfit text-slate-800 mb-2">Testez vos acquis</h4>
-                  <p className="text-slate-500 mb-8 max-w-[250px]">
-                    Validez ce module en réussissant le quiz final avec un score supérieur à 70%.
-                  </p>
-                  
-                  <button 
-                    onClick={() => navigate(`/quiz/${module.quiz}`)}
-                    className="w-full py-4 bg-warning text-white rounded-2xl font-bold shadow-3d-warning hover:bg-yellow-400 transition-all active:translate-y-1 active:shadow-none font-outfit text-lg"
-                  >
-                    Lancer le Quiz
-                  </button>
+               <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-md flex flex-col items-center text-center relative overflow-hidden">
+                  {quizScore !== undefined ? (
+                    <>
+                      <div className="absolute inset-0 bg-success/5 pointer-events-none"></div>
+                      <div className="w-20 h-20 bg-success/10 text-success rounded-full flex items-center justify-center mb-6 border-4 border-success/20">
+                        <Trophy size={40} />
+                      </div>
+                      <h4 className="text-2xl font-bold font-outfit text-slate-800 mb-2">Quiz Validé</h4>
+                      <p className="text-slate-500 mb-6 max-w-[250px]">
+                        Vous avez réussi ce quiz avec un score de {quizScore}%.
+                      </p>
+                      <Button onClick={() => navigate(`/quiz/${module.quiz}`)} variant="outline" className="w-full">
+                        Refaire le Quiz
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <div className="w-20 h-20 bg-warning/10 text-warning rounded-full flex items-center justify-center mb-6 border-4 border-warning/20">
+                         <HelpCircle size={40} />
+                      </div>
+                      <h4 className="text-2xl font-bold font-outfit text-slate-800 mb-2">Testez vos acquis</h4>
+                      <p className="text-slate-500 mb-8 max-w-[250px]">
+                        {allLessonsDone ? "Vous êtes prêt pour valider ce module !" : "Terminez toutes les leçons pour débloquer le quiz."}
+                      </p>
+                      
+                      <Button 
+                        onClick={() => navigate(`/quiz/${module.quiz}`)}
+                        variant="warning"
+                        disabled={!allLessonsDone}
+                        className={`w-full !py-4 text-lg ${allLessonsDone ? 'bg-warning hover:bg-yellow-400 text-white shadow-3d-warning' : 'bg-slate-200 text-slate-500'}`}
+                      >
+                        Lancer le Quiz
+                      </Button>
+                    </>
+                  )}
                </div>
             </div>
           </div>

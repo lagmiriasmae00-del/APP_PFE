@@ -1,59 +1,60 @@
 [
   {
-    "id": "math",
-    "name": "Mathématiques",
-    "icon": "Calculator",
+    "id": "algo",
+    "name": "Algorithmique et Logique",
+    "icon": "Code",
     "color": "primary",
-    "progress": 45,
+    "progress": 0,
     "modules": [
       {
-        "id": "m1",
-        "title": "Limites et Continuité",
+        "id": "m1_algo",
+        "title": "Bases de l'algorithmique",
         "lessons": [
-          { "id": "l1", "title": "Introduction aux limites", "type": "video", "content": "https://www.youtube.com/embed/dQw4w9WgXcQ" },
-          { "id": "l2", "title": "Théorème des valeurs intermédiaires", "type": "pdf", "content": "/path/to/pdf" }
+          { "id": "l1_algo", "title": "Variables et types de données", "type": "video", "content": "https://www.youtube.com/embed/dQw4w9WgXcQ" },
+          { "id": "l2_algo", "title": "Structures conditionnelles", "type": "pdf", "content": "/path/to/pdf" }
         ],
         "quiz": "q1"
       },
       {
-        "id": "m2",
-        "title": "Dérivabilité",
+        "id": "m2_algo",
+        "title": "Structures itératives",
         "lessons": [
-          { "id": "l3", "title": "Règles de dérivation", "type": "video", "content": "https://www.youtube.com/embed/dQw4w9WgXcQ" }
+          { "id": "l3_algo", "title": "Boucles (Pour, Tant que)", "type": "video", "content": "https://www.youtube.com/embed/dQw4w9WgXcQ" }
         ],
         "quiz": "q2"
       }
     ]
   },
   {
-    "id": "physique",
-    "name": "Physique-Chimie",
-    "icon": "FlaskConical",
-    "color": "danger",
-    "progress": 30,
+    "id": "web_front",
+    "name": "Développement Front-end",
+    "icon": "LayoutTemplate",
+    "color": "success",
+    "progress": 0,
     "modules": [
       {
-        "id": "m3",
-        "title": "Ondes mécaniques progressives",
+        "id": "m1_web",
+        "title": "HTML5 & CSS3",
         "lessons": [
-          { "id": "l4", "title": "Caractéristiques des ondes", "type": "pdf", "content": "/path/to/pdf" }
+          { "id": "l1_web", "title": "Structure sémantique HTML", "type": "pdf", "content": "/path/to/pdf" },
+          { "id": "l2_web", "title": "Stylisation avec CSS", "type": "video", "content": "https://www.youtube.com/embed/dQw4w9WgXcQ" }
         ],
         "quiz": "q3"
       }
     ]
   },
   {
-    "id": "svt",
-    "name": "SVT",
-    "icon": "Leaf",
-    "color": "success",
-    "progress": 15,
+    "id": "bdd",
+    "name": "Bases de Données",
+    "icon": "Database",
+    "color": "danger",
+    "progress": 0,
     "modules": [
       {
-        "id": "m4",
-        "title": "Consommation de la matière organique",
+        "id": "m1_bdd",
+        "title": "Modélisation des données",
         "lessons": [
-          { "id": "l5", "title": "La respiration cellulaire", "type": "video", "content": "https://www.youtube.com/embed/dQw4w9WgXcQ" }
+          { "id": "l1_bdd", "title": "Modèle Entité-Association (MCD)", "type": "video", "content": "https://www.youtube.com/embed/dQw4w9WgXcQ" }
         ],
         "quiz": "q4"
       }

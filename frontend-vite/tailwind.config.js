@@ -8,17 +8,17 @@ export default {
     extend: {
       colors: {
         primary: {
-          50: '#f0f9ff',
-          100: '#e0f2fe',
-          200: '#bae6fd',
-          300: '#7dd3fc',
-          400: '#38bdf8',
-          500: '#0ea5e9',
-          600: '#0284c7',
-          700: '#0369a1',
-          800: '#075985',
-          900: '#0c4a6e',
-          950: '#082f49',
+          50: '#f2f6fa',
+          100: '#e1edf4',
+          200: '#c8dfee',
+          300: '#a3cbe2',
+          400: '#75acd3',
+          500: '#5490c2',
+          600: '#4075a7',
+          700: '#345e8a',
+          800: '#2d5073',
+          900: '#133A5E', // SmartLearn Logo Color
+          950: '#0c253d',
         },
         success: '#58CC02', // Duolingo green
         warning: '#FFC800', // Duolingo yellow

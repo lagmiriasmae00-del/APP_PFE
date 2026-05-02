@@ -1,28 +1,47 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Clock, CheckCircle2, XCircle, Trophy, Home } from 'lucide-react';
-import quizzesData from '../data/quizzes.json';
+import { useAppContext } from '../context/AppContext';
+import { api } from '../services/api';
 import { motion } from 'framer-motion';
+import Button from '../components/ui/Button';
 
 export default function Exam() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const questions = quizzesData[id] || [];
+  const { saveExamScore } = useAppContext();
   
   const EXAM_TIME = 600; // 10 minutes
+  const [questions, setQuestions] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   const [timeLeft, setTimeLeft] = useState(EXAM_TIME);
   const [showResult, setShowResult] = useState(false);
   const [answers, setAnswers] = useState({});
   const [examScore, setExamScore] = useState(0);
 
   useEffect(() => {
-    if (timeLeft > 0 && !showResult) {
+    const fetchExam = async () => {
+      try {
+        const quizData = await api.getQuizById(id);
+        setQuestions(quizData || []);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchExam();
+  }, [id]);
+
+  useEffect(() => {
+    if (!loading && timeLeft > 0 && !showResult) {
       const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
       return () => clearTimeout(timer);
-    } else if (timeLeft === 0 && !showResult) {
+    } else if (!loading && timeLeft === 0 && !showResult) {
       handleSubmit();
     }
-  }, [timeLeft, showResult]);
+  }, [timeLeft, showResult, loading]);
 
   const handleSelect = (qIdx, optIdx) => {
     if (showResult) return;
@@ -36,6 +55,9 @@ export default function Exam() {
     });
     setExamScore(score);
     setShowResult(true);
+
+    const pct = Math.round((score / questions.length) * 100);
+    saveExamScore(id, pct);
   };
 
   const formatTime = (seconds) => {
@@ -43,6 +65,12 @@ export default function Exam() {
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
+
+  if (loading) return (
+    <div className="flex justify-center items-center h-64">
+      <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-600"></div>
+    </div>
+  );
 
   if (!questions.length) return <div>Examen introuvable</div>;
 
@@ -56,9 +84,9 @@ export default function Exam() {
             </div>
             <h2 className="text-4xl font-outfit font-bold text-slate-800 mb-2">Examen terminé</h2>
             <p className="text-xl text-slate-500 font-bold mb-8">Votre score final : {examScore} / {questions.length} ({pct}%)</p>
-            <button onClick={() => navigate('/dashboard')} className="w-full py-4 bg-primary-600 text-white rounded-2xl font-bold shadow-3d-info hover:bg-primary-500 flex items-center justify-center gap-2 font-outfit text-xl active:translate-y-1 active:shadow-none transition-all">
+            <Button onClick={() => navigate('/dashboard')} className="w-full !py-4 flex gap-2 font-outfit text-xl">
                <Home size={24} /> Terminer
-            </button>
+            </Button>
          </motion.div>
       </div>
     );
@@ -99,12 +127,13 @@ export default function Exam() {
        </div>
 
        <div className="pt-12 pb-12 flex justify-center">
-          <button 
+          <Button 
+             variant="success"
              onClick={handleSubmit} 
-             className="px-16 py-6 bg-success text-white rounded-[2rem] font-bold font-outfit text-2xl shadow-3d-success hover:bg-green-500 transition-all active:translate-y-1 active:shadow-none"
+             className="!px-16 !py-6 rounded-[2rem] font-bold font-outfit text-2xl"
           >
              VALIDER TOUT L'EXAMEN
-          </button>
+          </Button>
        </div>
     </div>
   );
