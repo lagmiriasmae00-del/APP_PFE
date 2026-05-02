@@ -15,8 +15,9 @@ return new class extends Migration
             $table->id();
             $table->integer('score')->default(0);
             $table->boolean('passe')->default(false);
+            $table->integer('reponse_correcte')->default(0);
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('quiz_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('quizze_id')->constrained()->cascadeOnDelete();
             $table->timestamp('date_passe')->nullable();
             $table->timestamps();
         });

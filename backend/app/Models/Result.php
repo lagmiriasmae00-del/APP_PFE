@@ -27,6 +27,6 @@ class Result extends Model
 
     public function quizze()
     {
-        return $this->belongsTo(Quizze::class);
+        return $this->belongsTo(Quizze::class,'quiz_id');
     }
 }

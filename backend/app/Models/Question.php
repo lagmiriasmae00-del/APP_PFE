@@ -13,7 +13,7 @@ class Question extends Model
 
     public function quizze()
     {
-        return $this->belongsTo(Quizze::class);
+        return $this->belongsTo(Quizze::class,'quizze_id');
     }
 
     public function choices()
