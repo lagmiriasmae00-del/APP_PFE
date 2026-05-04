@@ -11,7 +11,8 @@ class UserProfile extends Model
         'prenom',
         'role',
         'filiere_id',
-        'user_id'
+        'user_id',
+        'niveau'
     ];
 
     public function user()

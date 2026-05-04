@@ -32,6 +32,7 @@ class AuthController extends Controller
             'nom' => $request->nom,
             'prenom' => $request->prenom,
             'role' => 'stagiaire',
+            'niveau' => $request->niveau,
             'filiere_id' => $request->filiere_id,
         ]);
 

@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('titre');
             $table->longText('contenu');
             $table->string('pdf_url')->nullable();
+            $table->string('video_url')->nullable();
             $table->foreignId('module_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
         });

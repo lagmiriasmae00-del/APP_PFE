@@ -9,27 +9,49 @@ use Illuminate\Http\Request;
 class ModuleController extends Controller
 {
     // كيجيب كاع المواد ديال شعبة الطالب اللي مكونيكطي
-    public function index()
-    {
-        $user = auth()->user()->load('profile');
-        $filiereId = $user->profile->filiere_id;
-
-        $modules = Module::where('filiere_id', $filiereId)
-            ->withCount(['lessons', 'quizzes']) // كيحسب شحال من درس وامتحان
-            ->get();
+   public function index()
+   {
+        $user = auth()->user();
+        // كنجيبو غير المواد اللي عندها نفس الـ Niveau ديال الطالب ونفس الـ Filière
+        // (تأكد بلي زتي خانة niveau حتى فـ جدول profiles ولا users)
+        $modules = Module::where('filiere_id', $user->profile->filiere_id)
+                    ->where('niveau', $user->profile->niveau) 
+                    ->get();
 
         return response()->json($modules);
     }
 
     // كيجيب تفاصيل المادة (دروس وفيديوهات وامتحانات ووثائق)
+    
     public function show($id)
-    {
-        $module = Module::with([
-            'lessons.videos', 
-            'quizzes.questions.choices', // كيجيب الامتحان بأسئلته باختياراته
-            'documents.files'
-        ])->findOrFail($id);
+{
+    $user = auth()->user();
 
-        return response()->json($module);
+    // Eager Loading لجميع العلاقات باش نجيبو Package كامل
+    $module = Module::with([
+        'lessons.videos', // الدروس ومعاهم فيديوهاتهم
+        'quizzes',        // امتحانات المادة
+        'documents.files' // الوثائق (الامتحانات والملخصات) والملفات اللي وسطهم
+    ])
+    ->where('filiere_id', $user->profile->filiere_id)
+    ->where('niveau', $user->profile->niveau)
+    ->findOrFail($id);
+
+    return response()->json($module);
+}
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'titre' => 'required|string|max:255',
+            'niveau' => 'required|integer|in:1,2,3', // كنتأكدو بلي القيمة هي 1 ولا 2 فقط
+            'filiere_id' => 'required|exists:filieres,id',
+        ]);
+
+        $module = Module::create($validated);
+
+        return response()->json([
+            'message' => 'Module ajouté avec succès !',
+            'module' => $module
+        ], 201);
     }
 }
