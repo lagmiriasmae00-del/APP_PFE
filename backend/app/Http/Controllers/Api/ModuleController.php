@@ -54,4 +54,19 @@ class ModuleController extends Controller
             'module' => $module
         ], 201);
     }
+        // تعديل مادة
+    public function update(Request $request, $id)
+    {
+        $module = Module::findOrFail($id);
+        $module->update($request->all());
+        return response()->json(['message' => 'Module mis à jour !', 'module' => $module]);
+    }
+
+    // مسح مادة (مع الدروس ديالها أوتوماتيكياً)
+    public function destroy($id)
+    {
+        $module = Module::findOrFail($id);
+        $module->delete();
+        return response()->json(['message' => 'Module supprimé !']);
+    }
 }

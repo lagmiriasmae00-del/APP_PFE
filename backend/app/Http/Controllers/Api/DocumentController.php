@@ -14,6 +14,7 @@ class DocumentController extends Controller
         $request->validate([
             'titre' => 'required|string',
             'file' => 'required|file|mimes:pdf|max:10240',
+            'type' => 'required|in:cc,regional,efm',
             'module_id' => 'required|exists:modules,id'
         ]);
 

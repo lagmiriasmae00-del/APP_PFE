@@ -69,4 +69,16 @@ class QuizController extends Controller
             'total_questions' => $totalQuestions
         ]);
     }
+    public function myResults()
+    {
+        $user = auth()->user();
+        
+        // كنجيبو كاع النتائج ديال الطالب مع معلومات الـ Quiz والمادة ديالو
+        $results = Result::with('quiz.module')
+            ->where('user_id', $user->id)
+            ->orderBy('date_passe', 'desc')
+            ->get();
+
+        return response()->json($results);
+    }
 }

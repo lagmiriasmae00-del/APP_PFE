@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Result;
+use App\Models\Module;
+use App\Models\Document;
 
 class AuthController extends Controller
 {
@@ -70,4 +73,28 @@ class AuthController extends Controller
         auth()->user()->tokens()->delete();
         return response()->json(['message' => 'Déconnecté avec succès']);
     }
+    public function getStats() {
+    $user = auth()->user();
+    
+    // عدد الموديلات الخاصة بشعبة ومستوى الطالب
+    $modulesCount = Module::where('filiere_id', $user->profile->filiere_id)
+        ->where('niveau', $user->profile->niveau)
+        ->count();
+
+    // عدد الكويزات اللي دوزها الطالب بصح
+    $completedQuizzes = Result::where('user_id', $user->id)->count();
+
+    // عدد الامتحانات (الوثائق) المتوفرة لهاد الطالب
+    $examsCount = Document::whereHas('module', function($query) use ($user) {
+        $query->where('filiere_id', $user->profile->filiere_id)
+              ->where('niveau', $user->profile->niveau);
+    })->count();
+
+    return response()->json([
+        'modules_total' => $modulesCount,
+        'quizzes_completed' => $completedQuizzes,
+        'exams_total' => $examsCount,
+        'user_name' => $user->profile->nom . ' ' . $user->profile->prenom
+    ]);
+}
 }
