@@ -1,0 +1,37 @@
+import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { loginSuccess } from '../features/authSlice';
+import api from '../api/axios'; // تأكد من مسار ملف axios
+import { useNavigate, Link } from 'react-router-dom';
+
+const Login = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await api.post('/login', { email, password });
+      dispatch(loginSuccess(res.data));
+      navigate('/dashboard');
+    } catch (err) {
+      alert("الإيميل أو كلمة المرور غير صحيحة");
+    }
+  };
+
+  return (
+    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+      <form onSubmit={handleLogin} className="p-8 bg-white shadow-lg rounded-xl w-96">
+        <h2 className="text-2xl font-bold mb-6 text-center text-blue-600">EduLink - Login</h2>
+        <input type="email" placeholder="Email" className="w-full p-2 mb-4 border rounded" onChange={(e) => setEmail(e.target.value)} required />
+        <input type="password" placeholder="Password" className="w-full p-2 mb-4 border rounded" onChange={(e) => setPassword(e.target.value)} required />
+        <button type="submit" className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700">Se connecter</button>
+        <p className="mt-4 text-center text-sm">مازال ما عندك حساب؟ <Link to="/register" className="text-blue-500">سجل دابا</Link></p>
+      </form>
+    </div>
+  );
+};
+
+export default Login;
