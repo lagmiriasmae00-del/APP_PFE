@@ -18,7 +18,7 @@ const Register = () => {
       dispatch(loginSuccess(res.data));
       navigate('/dashboard');
     } catch (err) {
-      alert("تأكد من البيانات (Email unique / Password 8 chars)");
+      alert("Vérifiez vos données (Email unique / Password 8 chars)");
     }
   };
 

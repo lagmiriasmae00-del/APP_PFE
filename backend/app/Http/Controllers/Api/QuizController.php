@@ -14,13 +14,13 @@ class QuizController extends Controller
     public function submit(Request $request, $quizId)
     {
         $user = auth()->user();
-        // كنستقبلو الإجابات على شكل [question_id => choice_id]
+        // On reçoit les réponses sous la forme [question_id => choice_id]
         $userAnswers = $request->input('answers'); 
         
         $totalQuestions = 0;
         $correctAnswersCount = 0;
 
-        // كنجيبو كاع الأسئلة ديال هاد الـ Quiz باش نتأكدو من الإجابات
+        // On récupère toutes les questions de ce Quiz pour vérifier les réponses
         $quiz = Quizze::with('questions.choices')->findOrFail($quizId);
 
         foreach ($quiz->questions as $question) {
@@ -28,14 +28,14 @@ class QuizController extends Controller
             $submittedChoiceId = $userAnswers[$question->id] ?? null;
 
             if ($submittedChoiceId) {
-                // كنسجلو إجابة الطالب في الداتابيز
+                // On enregistre la réponse de l'étudiant dans la base de données
                 UserReponse::create([
                     'user_id' => $user->id,
                     'question_id' => $question->id,
                     'choice_id' => $submittedChoiceId
                 ]);
 
-                // كنتأكدو واش الاختيار اللي دار الطالب صحيح
+                // On vérifie si le choix fait par l'étudiant est correct
                 $isCorrect = Choice::where('id', $submittedChoiceId)
                     ->where('question_id', $question->id)
                     ->where('est_correcte', true)
@@ -47,11 +47,11 @@ class QuizController extends Controller
             }
         }
 
-        // حساب السكور (مثلا على 100)
+        // Calcul du score (ex: sur 100)
         $score = ($totalQuestions > 0) ? ($correctAnswersCount / $totalQuestions) * 100 : 0;
-        $passed = $score >= 50; // كينجح إلا جاب 50% أو أكثر
+        $passed = $score >= 50; // Réussi s'il obtient 50% ou plus
 
-        // تسجيل النتيجة النهائية في جدول results
+        // Enregistrement du résultat final dans la table results
         $result = Result::updateOrCreate(
             ['user_id' => $user->id, 'quiz_id' => $quizId],
             [
@@ -73,8 +73,8 @@ class QuizController extends Controller
     {
         $user = auth()->user();
         
-        // كنجيبو كاع النتائج ديال الطالب مع معلومات الـ Quiz والمادة ديالو
-        $results = Result::with('quiz.module')
+        // On récupère tous les résultats de l'étudiant avec les informations du Quiz et de son module
+        $results = Result::with('quizze.module')
             ->where('user_id', $user->id)
             ->orderBy('date_passe', 'desc')
             ->get();

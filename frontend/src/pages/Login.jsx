@@ -17,7 +17,7 @@ const Login = () => {
       dispatch(loginSuccess(res.data));
       navigate('/dashboard');
     } catch (err) {
-      alert("الإيميل أو كلمة المرور غير صحيحة");
+      alert("Email ou mot de passe incorrect");
     }
   };
 
@@ -28,7 +28,7 @@ const Login = () => {
         <input type="email" placeholder="Email" className="w-full p-2 mb-4 border rounded" onChange={(e) => setEmail(e.target.value)} required />
         <input type="password" placeholder="Password" className="w-full p-2 mb-4 border rounded" onChange={(e) => setPassword(e.target.value)} required />
         <button type="submit" className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700">Se connecter</button>
-        <p className="mt-4 text-center text-sm">مازال ما عندك حساب؟ <Link to="/register" className="text-blue-500">سجل دابا</Link></p>
+        <p className="mt-4 text-center text-sm">Vous n'avez pas encore de compte ? <Link to="/register" className="text-blue-500">Inscrivez-vous maintenant</Link></p>
       </form>
     </div>
   );

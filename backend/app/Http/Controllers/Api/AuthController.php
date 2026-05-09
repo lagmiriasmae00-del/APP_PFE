@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Result;
 use App\Models\Module;
 use App\Models\Document;
-
 class AuthController extends Controller
 {
     public function register(Request $request) {
@@ -19,17 +18,19 @@ class AuthController extends Controller
             'password' => 'required|string|min:8',
             'nom' => 'required|string',
             'prenom' => 'required|string',
+            'niveau' => 'required|integer',
             'filiere_id' => 'required|exists:filieres,id',
         ]);
 
         // 2. Create User
         $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
+            'name'     => $request->name,
+            'email'    => $request->email,
             'password' => Hash::make($request->password),
+            'niveau'   => $request->niveau, // Indispensable car présent dans la table users et ne peut pas être vide
         ]);
 
-        // 3. Create UserProfile (العلاقة خاص تكون profile() فـ موديل User)
+        // 3. Create UserProfile (La relation doit être profile() dans le modèle User)
         $user->profile()->create([
             'nom' => $request->nom,
             'prenom' => $request->prenom,
@@ -68,7 +69,7 @@ class AuthController extends Controller
     }
 
     public function logout() {
-        // كيمسح كاع الـ tokens ديال هاد الـ user
+        // Supprime tous les tokens de cet utilisateur
         auth()->user()->tokens()->delete();
         return response()->json(['message' => 'Déconnecté avec succès']);
     }
