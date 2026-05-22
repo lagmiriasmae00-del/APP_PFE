@@ -110,7 +110,9 @@ const QuizPage = ({ quizId = 1 }) => { // تقدري تبدلي 1 بالـ ID ل
                     </button>
                 </div>
             </div>
+            <p>siham khayba hmara bagra</p>
         </div>
+        
     );
 };
 
