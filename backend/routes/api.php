@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\QuizController;
 use App\Http\Controllers\Api\ModuleController;
+use App\Models\Filiere;
+
 
 // 1. Public Routes
 Route::post('/register', [AuthController::class, 'register']);
@@ -21,10 +23,10 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // --- صلاحيات الطالب (Stagiaire) ---
     Route::middleware('role:stagiaire,admin')->group(function () {
-        Route::get('/my-modules', [ModuleController::class, 'index']); 
-        Route::get('/module/{id}', [ModuleController::class, 'show']);
-        Route::post('/quiz/{id}/submit', [QuizController::class, 'submit']);
-        Route::get('/my-results', [QuizController::class, 'myResults']);
+    Route::get('/my-modules', [ModuleController::class, 'index']); 
+    Route::get('/module/{id}', [ModuleController::class, 'show']);
+    Route::post('/quiz/{id}/submit', [QuizController::class, 'submit']);
+    Route::get('/my-results', [QuizController::class, 'myResults']);
     });
 
     // --- صلاحيات الـ Admin (زيادة وتعديل الداتا) ---
@@ -35,4 +37,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/users/{id}', [AuthController::class, 'deleteUser']); // يمسح مستخدم
         // تقدر تزيد هنا Delete و Update من بعد
     });
+});
+
+Route::get('/filieres', function () {
+    return response()->json(Filiere::all());
 });

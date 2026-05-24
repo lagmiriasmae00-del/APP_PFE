@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\QuizzeController;
+use App\Http\Controllers\Api\QuizController;
 
-Route::get('/quizze/{id}', [QuizzeController::class, 'show']);
+Route::get('/quizze/{id}', [QuizController::class, 'show']);
