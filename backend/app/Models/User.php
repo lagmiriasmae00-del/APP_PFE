@@ -1,26 +1,37 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use App\Models\UserProfile;
-use App\Models\UserReponse;
-use App\Models\Result;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Laravel\Sanctum\HasApiTokens;
+
 class User extends Authenticatable
 {
-    use HasApiTokens;
+    use HasApiTokens, SoftDeletes;
 
     protected $fillable = [
         'name',
         'email',
         'password',
-        'niveau', // ضروري تزيد هادي حيت كينة فـ جدول users
     ];
 
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
+    ];
+
+    // Relations
     public function profile()
     {
         return $this->hasOne(UserProfile::class);
     }
+
     public function reponses()
     {
         return $this->hasMany(UserReponse::class);
@@ -29,5 +40,11 @@ class User extends Authenticatable
     public function results()
     {
         return $this->hasMany(Result::class);
+    }
+
+    // Accessor for niveau (get from profile)
+    public function getNiveauAttribute()
+    {
+        return $this->profile?->niveau;
     }
 }

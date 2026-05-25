@@ -3,13 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Quizze;
-use App\Models\Lesson;
-use App\Models\Filiere;
-use App\Models\Document;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
 class Module extends Model
 {
-    protected $fillable = ['titre', 'niveau', 'filiere_id'];
+    use SoftDeletes;
+
+    protected $fillable = ['titre', 'niveau', 'filiere_id', 'description'];
 
     public function filiere()
     {

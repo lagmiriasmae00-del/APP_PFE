@@ -1,12 +1,15 @@
 <?php
+
 namespace App\Models;
+
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Question;
-use App\Models\Module;
-use App\Models\Result;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
 class Quizze extends Model
 {
-    protected $fillable = ['titre', 'module_id'];
+    use SoftDeletes;
+
+    protected $fillable = ['titre', 'module_id', 'description'];
     protected $table = 'quizzes';
 
     public function module()
@@ -16,11 +19,11 @@ class Quizze extends Model
 
     public function questions()
     {
-        return $this->hasMany(Question::class);
+        return $this->hasMany(Question::class, 'quizze_id');
     }
 
     public function results()
     {
-        return $this->hasMany(Result::class);
+        return $this->hasMany(Result::class, 'quiz_id');
     }
 }

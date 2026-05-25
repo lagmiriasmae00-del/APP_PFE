@@ -47,9 +47,12 @@ const Register = () => {
       dispatch(loginSuccess(res.data));
       navigate('/dashboard');
     } catch (err) {
-      if (err.response && err.response.data.errors) {
-        const firstError = Object.values(err.response.data.errors)[0][0];
+      // حماية الكود من الـ Crash ومطابقة الخطأ أوتوماتيكياً
+      if (err.response && err.response.data && err.response.data.errors) {
+        const firstError = Object.values(err.response.data.errors);
         setErrorMsg(firstError);
+      } else if (err.response && err.response.data && err.response.data.message) {
+        setErrorMsg(err.response.data.message);
       } else {
         setErrorMsg("Vérifiez vos données (Email unique / Password 8 chars)");
       }

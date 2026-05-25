@@ -1,61 +1,105 @@
 <?php
+
 namespace App\Http\Controllers\Api;
+
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
 use App\Models\Result;
 use App\Models\Module;
 use App\Models\Document;
+
 class AuthController extends Controller
 {
-    public function register(Request $request) {
-        // 1. Validation
-        $request->validate([
+    public function register(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8',
-            'nom' => 'required|string',
-            'prenom' => 'required|string',
-            'niveau' => 'required|integer',
-            'filiere_id' => 'required|exists:filieres,id',
+            'password' => 'required|string|min:8|confirmed',
+            'nom' => 'required|string|max:255',
+            'prenom' => 'required|string|max:255',
+            'niveau' => 'required|integer|in:1,2', // تعويض مباشر لتفادي مشاكل الـ config
+            'filiere_id' => 'required|integer|exists:filieres,id',
         ]);
 
-        // 2. Create User
-        $user = User::create([
-            'name'     => $request->name,
-            'email'    => $request->email,
-            'password' => Hash::make($request->password),
-            'niveau'   => $request->niveau, // Indispensable car présent dans la table users et ne peut pas être vide
-        ]);
+        try {
+            // Create user
+            $user = User::create([
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'password' => Hash::make($validated['password']),
+            ]);
 
-        // 3. Create UserProfile (La relation doit être profile() dans le modèle User)
-        $user->profile()->create([
-            'nom' => $request->nom,
-            'prenom' => $request->prenom,
-            'role' => 'stagiaire',
-            'niveau' => $request->niveau,
-            'filiere_id' => $request->filiere_id,
-        ]);
+            // Create user profile
+            $user->profile()->create([
+                'nom' => $validated['nom'],
+                'prenom' => $validated['prenom'],
+                'role' => 'stagiaire',
+                'niveau' => $validated['niveau'],
+                'filiere_id' => $validated['filiere_id'],
+            ]);
 
-        // 4. Generate Token
-        $token = $user->createToken('auth_token')->plainTextToken;
+            // Generate token
+            $token = $user->createToken('auth_token')->plainTextToken;
 
-        return response()->json([
-            'access_token' => $token,
-            'token_type' => 'Bearer',
-            'user' => $user->load('profile')
-        ]);
+            Log::info('User registered', [
+                'user_id' => $user->id,
+                'email' => $user->email,
+                'ip' => request()->ip()
+            ]);
+
+            return response()->json([
+                'access_token' => $token,
+                'token_type' => 'Bearer',
+                'user' => $user->load('profile')
+            ], 201);
+        } catch (\Exception $e) {
+            Log::error('Registration error', [
+                'email' => $validated['email'] ?? null,
+                'error' => $e->getMessage()
+            ]);
+
+            return response()->json([
+                'error' => 'Registration failed'
+            ], 500);
+        }
     }
 
-    public function login(Request $request) {
-        if (!Auth::attempt($request->only('email', 'password'))) {
-            return response()->json(['message' => 'Email ou mot de passe incorrect'], 401);
+    public function login(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'email' => 'required|string|email',
+            'password' => 'required|string'
+        ]);
+
+        if (!Auth::attempt($validated)) {
+            Log::warning('Failed login attempt', [
+                'email' => $validated['email'],
+                'ip' => request()->ip()
+            ]);
+
+            throw ValidationException::withMessages([
+                'email' => 'The provided credentials are incorrect.',
+            ]);
         }
 
-        $user = User::where('email', $request->email)->firstOrFail();
+        $user = User::where('email', $validated['email'])->firstOrFail();
+        
+        // Revoke old tokens and create new one
+        $user->tokens()->delete();
         $token = $user->createToken('auth_token')->plainTextToken;
+
+        Log::info('User logged in', [
+            'user_id' => $user->id,
+            'ip' => request()->ip()
+        ]);
 
         return response()->json([
             'access_token' => $token,
@@ -64,37 +108,73 @@ class AuthController extends Controller
         ]);
     }
 
-    public function userProfile() {
+    public function userProfile(): JsonResponse
+    {
         return response()->json(auth()->user()->load('profile.filiere'));
     }
 
-    public function logout() {
-        // Supprime tous les tokens de cet utilisateur
+    public function logout(): JsonResponse
+    {
         auth()->user()->tokens()->delete();
-        return response()->json(['message' => 'Déconnecté avec succès']);
+        
+        Log::info('User logged out', [
+            'user_id' => auth()->id()
+        ]);
+
+        return response()->json(['message' => 'Logged out successfully']);
     }
-    public function getStats() {
-    $user = auth()->user();
-    
-    // عدد الموديلات الخاصة بشعبة ومستوى الطالب
-    $modulesCount = Module::where('filiere_id', $user->profile->filiere_id)
-        ->where('niveau', $user->profile->niveau)
-        ->count();
 
-    // عدد الكويزات اللي دوزها الطالب بصح
-    $completedQuizzes = Result::where('user_id', $user->id)->count();
+    public function getStats(): JsonResponse
+    {
+        $user = auth()->user();
+        $cacheKey = "user_{$user->id}_stats";
+        
+        // تعويض الـ Cache للتسهيل، إذا ما عندك كود الـ TTL ف الـ config غايعطيك ساعة أوتوماتيكياً (3600 ثانية)
+        $ttl = config('quiz.stats_cache_ttl', 3600);
 
-    // عدد الامتحانات (الوثائق) المتوفرة لهاد الطالب
-    $examsCount = Document::whereHas('module', function($query) use ($user) {
-        $query->where('filiere_id', $user->profile->filiere_id)
-              ->where('niveau', $user->profile->niveau);
-    })->count();
+        $stats = Cache::remember($cacheKey, $ttl, function () use ($user) {
+            return [
+                'modules_total' => Module::where('filiere_id', $user->profile->filiere_id)
+                    ->where('niveau', $user->profile->niveau)
+                    ->count(),
+                'quizzes_completed' => Result::where('user_id', $user->id)->count(),
+                'exams_total' => Document::whereHas('module', function($query) use ($user) {
+                    $query->where('filiere_id', $user->profile->filiere_id)
+                          ->where('niveau', $user->profile->niveau);
+                })->count(),
+                'user_name' => $user->profile->nom . ' ' . $user->profile->prenom
+            ];
+         biographical_data: });
 
-    return response()->json([
-        'modules_total' => $modulesCount,
-        'quizzes_completed' => $completedQuizzes,
-        'exams_total' => $examsCount,
-        'user_name' => $user->profile->nom . ' ' . $user->profile->prenom
-    ]);
-}
-}
+        return response()->json($stats);
+    }
+
+    public function allUsers(): JsonResponse
+    {
+        $users = User::with('profile.filiere')->paginate(20);
+        return response()->json($users);
+    }
+
+    public function deleteUser(int $id): JsonResponse
+    {
+        $user = User::findOrFail($id);
+
+        // Verify authorization (بش الـ Admin ما يمسحش راسو ب غلط)
+        if (auth()->id() === $id) {
+            return response()->json([
+                'error' => 'Cannot delete your own account'
+            ], 422);
+        }
+
+        $email = $user->email;
+        $user->delete();
+
+        Log::warning('User deleted', [
+            'deleted_user_id' => $id,
+            'deleted_email' => $email,
+            'admin_id' => auth()->id()
+        ]);
+
+        return response()->json(['message' => 'Utilisateur supprimé avec succès']);
+    }
+} 

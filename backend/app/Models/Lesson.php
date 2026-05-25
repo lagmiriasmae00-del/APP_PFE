@@ -3,12 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Module;
-use App\Models\LessonVideo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Lesson extends Model
 {
-    protected $fillable = ['titre', 'contenu', 'pdf_url', 'module_id'];
+    use SoftDeletes;
+
+    protected $fillable = ['titre', 'contenu', 'pdf_url', 'video_url', 'module_id'];
 
     public function module()
     {
@@ -17,6 +18,6 @@ class Lesson extends Model
 
     public function videos()
     {
-        return $this->hasMany(LessonVideo::class);
+        return $this->hasMany(LessonVideo::class)->orderBy('order', 'asc');
     }
 }

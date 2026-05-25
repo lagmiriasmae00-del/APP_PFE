@@ -3,12 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Choice;
-use App\Models\Question;
-use App\Models\User;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class UserReponse extends Model
 {
+    use SoftDeletes;
+
     protected $fillable = ['user_id', 'question_id', 'choice_id'];
 
     public function user()

@@ -3,17 +3,17 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Choice;
-use App\Models\Quizze;
-
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Question extends Model
 {
-     protected $fillable = ['question', 'point', 'quizze_id'];
+    use SoftDeletes;
+
+    protected $fillable = ['question', 'point', 'quizze_id'];
 
     public function quizze()
     {
-        return $this->belongsTo(Quizze::class,'quizze_id');
+        return $this->belongsTo(Quizze::class, 'quizze_id');
     }
 
     public function choices()
