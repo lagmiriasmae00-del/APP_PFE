@@ -32,22 +32,7 @@ const Home = () => {
             </button>
           </div>
 
-          {/* Social Proof - الناس اللي واثقين فينا */}
-          <div className="pt-8 flex items-center justify-center md:justify-start space-x-2">
-            <div className="flex -space-x-2">
-              {[1, 2, 3, 4].map((i) => (
-                <img 
-                  key={i}
-                  className="w-8 h-8 rounded-full border-2 border-white bg-gray-200" 
-                  src={`https://i.pravatar.cc/100?u=${i}`} 
-                  alt="user"
-                />
-              ))}
-            </div>
-            <p className="text-gray-500 text-sm font-medium">
-              <span className="font-bold text-gray-900">+10k</span> étudiants nous font confiance
-            </p>
-          </div>
+
         </div>
 
         {/* الصورة - Right Side */}

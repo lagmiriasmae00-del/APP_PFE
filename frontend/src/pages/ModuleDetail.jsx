@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import api from '../api/axios';
+import DocumentSection from '../components/DocumentSection';
 
 const ModuleDetail = () => {
   const { id } = useParams(); 
@@ -68,28 +69,7 @@ const ModuleDetail = () => {
         )}
 
         {activeTab === 'documents' && (
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-            <table className="w-full text-left">
-              <thead className="bg-gray-50 border-b">
-                <tr>
-                  <th className="px-6 py-4 text-gray-600 font-bold">Titre du document</th>
-                  <th className="px-6 py-4 text-gray-600 font-bold">Type</th>
-                  <th className="px-6 py-4 text-gray-600 font-bold">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {module.documents?.map(doc => (
-                  <tr key={doc.id} className="border-b last:border-0 hover:bg-gray-50 transition">
-                    <td className="px-6 py-4 font-medium text-gray-800">{doc.titre}</td>
-                    <td className="px-6 py-4 text-gray-500 uppercase text-xs font-bold">{doc.type}</td>
-                    <td className="px-6 py-4">
-                      <button className="text-blue-600 font-bold hover:underline">Télécharger</button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <DocumentSection documents={module.documents || []} />
         )}
         
         {((activeTab === 'lessons' && (!module.lessons || module.lessons.length === 0)) || 
