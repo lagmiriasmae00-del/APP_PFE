@@ -21,11 +21,11 @@ const ExamensAdmin = () => {
   const [type, setType] = useState('EFM');
   const [fichierUrl, setFichierUrl] = useState('');
 
-  // جلب قائمة الامتحانات
+  // جلب قائمة الامتحانات (Quizzes)
   const fetchExamens = async () => {
     try {
       setLoading(true);
-      const res = await api.get('/admin/examens');
+      const res = await api.get('/admin/quizzes');
       setExamens(res.data);
     } catch (err) {
       console.error(err);
@@ -39,7 +39,8 @@ const ExamensAdmin = () => {
   const fetchModules = async () => {
     try {
       const res = await api.get('/admin/modules');
-      setModules(res.data);
+      // modules data is a plain array from the admin route
+      setModules(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
       console.error(err);
       setMessage({ text: 'Erreur lors du chargement des modules.', type: 'error' });
@@ -99,12 +100,12 @@ const ExamensAdmin = () => {
 
     try {
       if (editingExamen) {
-        // تعديل الامتحان
-        await api.put(`/admin/examens/${editingExamen.id}`, data);
+        // تعديل الامتحان (quiz)
+        await api.put(`/quizzes/${editingExamen.id}`, data);
         setMessage({ text: 'Examen modifié avec succès !', type: 'success' });
       } else {
-        // إضافة امتحان جديد
-        await api.post('/admin/examens', data);
+        // إضافة امتحان جديد (quiz)
+        await api.post('/quizzes', data);
         setMessage({ text: 'Examen ajouté avec succès !', type: 'success' });
       }
       closeModal();
@@ -126,7 +127,7 @@ const ExamensAdmin = () => {
 
   const handleDelete = async () => {
     try {
-      await api.delete(`/admin/examens/${deletingId}`);
+      await api.delete(`/quizzes/${deletingId}`);
       setMessage({ text: 'Examen supprimé avec succès !', type: 'success' });
       setShowDeleteConfirm(false);
       setDeletingId(null);
@@ -248,7 +249,7 @@ const ExamensAdmin = () => {
                         )}
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-600">
-                        {examen.module?.nom || '—'}
+                        {examen.module?.titre || '—'}
                       </td>
                       <td className="px-6 py-4 text-sm font-medium text-gray-700">
                         {examen.annee}

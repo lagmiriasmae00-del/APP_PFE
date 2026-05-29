@@ -14,6 +14,12 @@ use Illuminate\Support\Facades\Log;
 
 class QuizController extends Controller
 {
+    public function index(): JsonResponse
+    {
+        $quizzes = Quizze::with(['module'])->get();
+        return response()->json($quizzes);
+    }
+
     public function submit(Request $request, int $quizId): JsonResponse
     {
         $user = auth()->user();

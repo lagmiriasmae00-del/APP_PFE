@@ -19,16 +19,16 @@ const AdminDashboard = () => {
         setError(null);
 
         // كنطلقو 3 requêtes بالتوازي باش يكون أسرع
-        const [filieresRes, modulesRes, examensRes] = await Promise.all([
+        const [filieresRes, modulesRes, quizzesRes] = await Promise.all([
           api.get('/admin/filieres'),
           api.get('/admin/modules'),
-          api.get('/admin/examens'),
+          api.get('/admin/quizzes'),
         ]);
 
         setStats({
           filieres: Array.isArray(filieresRes.data) ? filieresRes.data.length : 0,
           modules: Array.isArray(modulesRes.data) ? modulesRes.data.length : 0,
-          examens: Array.isArray(examensRes.data) ? examensRes.data.length : 0,
+          examens: Array.isArray(quizzesRes.data) ? quizzesRes.data.length : 0,
         });
       } catch (err) {
         console.error('Erreur lors du chargement des statistiques:', err);

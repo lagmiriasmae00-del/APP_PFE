@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('nom');
             $table->string('prenom');
-            $table->integer('niveau');
+            $table->integer('niveau')->nullable();
             $table->enum('role', ['stagiaire', 'admin'])->default('stagiaire');
             $table->foreignId('filiere_id')->nullable()->constrained()->onDelete('set null');
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');

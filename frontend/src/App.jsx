@@ -4,7 +4,6 @@ import { useSelector } from 'react-redux';
 // Components
 import Header from './components/Header';
 import Footer from './components/Footer';
-import AdminLayout from './components/AdminLayout';
 
 // Pages - Public & Student
 import Home from './pages/Home';           
@@ -21,8 +20,11 @@ import AdminDashboard from './pages/admin/AdminDashboard';
 import ModulesAdmin from './pages/admin/ModulesAdmin';
 import ExamensAdmin from './pages/admin/ExamensAdmin';
 import DocumentsAdmin from './pages/admin/DocumentsAdmin';
+import FilieresAdmin from './pages/admin/FilieresAdmin';
+import UsersAdmin from './pages/admin/UsersAdmin';
+import LessonsAdmin from './pages/admin/LessonsAdmin';
 
-// Public Layout Component
+// القالب الموحد والوحيد للمنصة (بدون Sidebar جانبية) ✨
 const PublicLayout = () => (
   <div className="flex flex-col min-h-screen">
     <Header />
@@ -40,30 +42,23 @@ function App() {
     <Router>
       <Routes>
         
-        {/* === Admin Routes === */}
-        {/* For now, assuming anyone authenticated can access or we just protect it with isAuthenticated */}
-        <Route path="/admin" element={isAuthenticated ? <AdminLayout /> : <Navigate to="/login" />}>
-          <Route index element={<AdminDashboard />} />
-          <Route path="modules" element={<ModulesAdmin />} />
-          <Route path="quizzes" element={<ExamensAdmin />} />
-          <Route path="documents" element={<DocumentsAdmin />} />
-        </Route>
-
-        {/* === Public & Student Routes === */}
+        {/* كاع الروابط (العامة، الطلبة، والأدمين) مجموعين تحت نفس الـ Layout النقي */}
         <Route path="/" element={<PublicLayout />}>
+          
+          {/* === الروابط العامة === */}
           <Route index element={<Home />} />
           <Route path="about" element={<About />} />
 
           <Route 
-            path="login" 
-            element={!isAuthenticated ? <Login /> : <Navigate to="/dashboard" />} 
-          />
+  path="login" 
+  element={!isAuthenticated ? <Login /> : <Navigate to="/dashboard" />} 
+/>
           <Route 
             path="register" 
             element={!isAuthenticated ? <Register /> : <Navigate to="/dashboard" />} 
           />
 
-          {/* Protected Routes */}
+          {/* === روابط الـ Stagiaire المحمية === */}
           <Route 
             path="dashboard" 
             element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />} 
@@ -81,6 +76,16 @@ function App() {
             element={isAuthenticated ? <Profile /> : <Navigate to="/login" />} 
           />
 
+          {/* === روابط الـ Admin المحمية (بقت بنفس العناوين وبدون Sidebar) 🔐 === */}
+          <Route path="admin" element={isAuthenticated ? <AdminDashboard /> : <Navigate to="/login" />} />
+          <Route path="admin/modules" element={isAuthenticated ? <ModulesAdmin /> : <Navigate to="/login" />} />
+          <Route path="admin/quizzes" element={isAuthenticated ? <ExamensAdmin /> : <Navigate to="/login" />} />
+          <Route path="admin/documents" element={isAuthenticated ? <DocumentsAdmin /> : <Navigate to="/login" />} />
+          <Route path="admin/filieres" element={isAuthenticated ? <FilieresAdmin /> : <Navigate to="/login" />} />
+          <Route path="admin/users" element={isAuthenticated ? <UsersAdmin /> : <Navigate to="/login" />} />
+          <Route path="admin/lessons" element={isAuthenticated ? <LessonsAdmin /> : <Navigate to="/login" />} />
+
+          {/* تدوير الروابط الغلط */}
           <Route path="*" element={<Navigate to="/" />} />
         </Route>
 

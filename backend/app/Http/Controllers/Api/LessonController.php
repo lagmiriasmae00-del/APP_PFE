@@ -14,12 +14,18 @@ use Illuminate\Http\JsonResponse;
 
 class LessonController extends Controller
 {
+    public function index(): JsonResponse
+    {
+        $lessons = Lesson::with(['module', 'videos'])->orderBy('id', 'desc')->get();
+        return response()->json($lessons);
+    }
+
     public function store(Request $request): JsonResponse
     {
         $request->validate([
             'titre' => 'required|string|max:255',
             'module_id' => 'required|integer|exists:modules,id',
-            'pdf_file' => 'nullable|file|mimes:pdf|max:10240', // حد أقصى 10 ميجا ديريكت
+            'pdf_file' => 'nullable|file|mimes:pdf|max:10240',
             'contenu' => 'nullable|string',
             'videos' => 'nullable|array', 
             'videos.*.video_url' => 'required|url',
@@ -43,7 +49,6 @@ class LessonController extends Controller
                 $path = $file->storeAs('lessons_pdfs', $fileName, 'public');
             }
 
-            // إنشاء الدرس
             $lesson = Lesson::create([
                 'titre' => $request->titre,
                 'pdf_url' => $path ? '/storage/' . $path : null,
@@ -51,13 +56,12 @@ class LessonController extends Controller
                 'contenu' => $request->contenu
             ]);
 
-            // إضافة الفيديوهات المتعددة إذا أرسلت
             if ($request->has('videos')) {
                 foreach ($request->videos as $video) {
                     LessonVideo::create([
                         'video_url' => $video['video_url'],
                         'order' => $video['order'],
-                        'lessons_id' => $lesson->id // الربط مع الـ ID الجديد للدرس
+                        'lessons_id' => $lesson->id
                     ]);
                 }
             }
@@ -65,7 +69,7 @@ class LessonController extends Controller
             Log::info('Lesson created with videos', ['lesson_id' => $lesson->id, 'admin_id' => auth()->id()]);
             
             return response()->json($lesson->load('videos'), 201);
-        ]);
+        });
     }
 
     public function update(Request $request, $id): JsonResponse
@@ -80,7 +84,6 @@ class LessonController extends Controller
         ]);
 
         if ($request->hasFile('pdf_file')) {
-            // حذف الملف القديم
             if ($lesson->pdf_url) {
                 $oldPath = str_replace('/storage/', 'public/', $lesson->pdf_url);
                 Storage::delete($oldPath);
@@ -103,13 +106,11 @@ class LessonController extends Controller
     {
         $lesson = Lesson::with('videos')->findOrFail($id);
 
-        // حذف ملف الـ PDF من الـ Storage
         if ($lesson->pdf_url) {
             $filePath = str_replace('/storage/', 'public/', $lesson->pdf_url);
             Storage::delete($filePath);
         }
 
-        // حذف الفيديوهات التابعة للدرس يدوياً لضمان النظافة
         foreach($lesson->videos as $video) {
             $video->delete();
         }

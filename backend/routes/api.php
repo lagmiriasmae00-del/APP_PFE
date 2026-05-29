@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\QuizController;
 use App\Http\Controllers\Api\ModuleController;
 use App\Http\Controllers\Api\DocumentController;
 use App\Http\Controllers\Api\LessonController;
+use App\Http\Controllers\Api\FiliereController;
 use App\Models\Filiere;
 
 
@@ -33,12 +34,14 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Admin routes
     Route::middleware('role:admin')->group(function () {
-        // Modules CRUD
+        // Modules CRUD (Admin - GET all for admin dashboard)
+        Route::get('/admin/modules', [ModuleController::class, 'index']);
         Route::post('/modules', [ModuleController::class, 'store']);
         Route::put('/modules/{id}', [ModuleController::class, 'update']);
         Route::delete('/modules/{id}', [ModuleController::class, 'destroy']);
         
-        // Quizzes CRUD
+        // Quizzes CRUD (Admin - GET all for admin dashboard)
+        Route::get('/admin/quizzes', [QuizController::class, 'index']);
         Route::post('/quizzes', [QuizController::class, 'store']);
         Route::put('/quizzes/{id}', [QuizController::class, 'update']);
         Route::delete('/quizzes/{id}', [QuizController::class, 'destroy']);
@@ -48,6 +51,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/documents/{id}', [DocumentController::class, 'destroy']);
         
         // Lessons CRUD
+        Route::get('/admin/lessons', [LessonController::class, 'index']);
         Route::post('/lessons', [LessonController::class, 'store']);
         Route::put('/lessons/{id}', [LessonController::class, 'update']);
         Route::delete('/lessons/{id}', [LessonController::class, 'destroy']);
@@ -55,6 +59,12 @@ Route::middleware('auth:sanctum')->group(function () {
         // User Management
         Route::get('/users', [AuthController::class, 'allUsers']);
         Route::delete('/users/{id}', [AuthController::class, 'deleteUser']);
+
+        // Filieres CRUD (Admin specific path)
+        Route::get('/admin/filieres', [FiliereController::class, 'index']);
+        Route::post('/admin/filieres', [FiliereController::class, 'store']);
+        Route::put('/admin/filieres/{id}', [FiliereController::class, 'update']);
+        Route::delete('/admin/filieres/{id}', [FiliereController::class, 'destroy']);
     });
 });
 

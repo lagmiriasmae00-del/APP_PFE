@@ -13,6 +13,12 @@ use App\Models\DocumentFile;
 
 class DocumentController extends Controller
 {
+   public function index()
+    {
+        $documents = Document::with(['module', 'filiere', 'files'])->orderBy('created_at', 'desc')->get();
+        return response()->json($documents);
+    }
+
    public function store(Request $request)
     {
         // 1. Validation (حيدنا config() باش نسهلوها وتخدم ليك ديريكت بدون تعقيد)
