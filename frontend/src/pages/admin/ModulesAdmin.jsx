@@ -1,10 +1,8 @@
 /* eslint-disable */
-// صفحة إدارة الموديلات - CRUD كامل
 import { useState, useEffect } from 'react';
 import api from '../../api/axios';
 
 const ModulesAdmin = () => {
-  // الحالات ديال الكومبوننت
   const [modules, setModules] = useState([]);
   const [filieres, setFilieres] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -18,12 +16,12 @@ const ModulesAdmin = () => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
 
-  // جلب الموديلات من الـ API
+  // جلب الموديلات - تصحيح الـ Route تماثلاً مع الـ Dashboard
   const fetchModules = async () => {
     try {
       setLoading(true);
-      const response = await api.get('/api/admin/modules');
-      setModules(response.data);
+      const response = await api.get('/admin/modules');
+      setModules(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error('خطأ فجلب الموديلات:', error);
       setMessage({ text: 'Erreur lors du chargement des modules.', type: 'error' });
@@ -32,23 +30,21 @@ const ModulesAdmin = () => {
     }
   };
 
-  // جلب الفيليارات من الـ API
+  // جلب الفيليارات - تصحيح الـ Route
   const fetchFilieres = async () => {
     try {
-      const response = await api.get('/api/admin/filieres');
-      setFilieres(response.data);
+      const response = await api.get('/admin/filieres');
+      setFilieres(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error('خطأ فجلب الفيليارات:', error);
     }
   };
 
-  // جلب البيانات فاول مرة كيتحمل الكومبوننت
   useEffect(() => {
     fetchModules();
     fetchFilieres();
   }, []);
 
-  // تايمر باش الرسالة تختفي بعد 3 ثواني
   useEffect(() => {
     if (message.text) {
       const timer = setTimeout(() => setMessage({ text: '', type: '' }), 3000);
@@ -56,7 +52,6 @@ const ModulesAdmin = () => {
     }
   }, [message]);
 
-  // فتح المودال للإضافة
   const openAddModal = () => {
     setEditingModule(null);
     setNom('');
@@ -66,17 +61,15 @@ const ModulesAdmin = () => {
     setShowModal(true);
   };
 
-  // فتح المودال للتعديل
   const openEditModal = (mod) => {
     setEditingModule(mod);
-    setNom(mod.nom);
+    setNom(mod.titre || mod.nom || ''); // دعم الإسمين معاً
     setDescription(mod.description || '');
     setFiliereId(mod.filiere_id);
     setNiveau(mod.niveau);
     setShowModal(true);
   };
 
-  // إغلاق المودال
   const closeModal = () => {
     setShowModal(false);
     setEditingModule(null);
@@ -86,19 +79,16 @@ const ModulesAdmin = () => {
     setNiveau('');
   };
 
-  // إرسال الفورم - إضافة ولا تعديل
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const data = { nom, description, filiere_id, niveau: parseInt(niveau) };
+      const data = { nom, titre: nom, description, filiere_id, niveau: parseInt(niveau) };
 
       if (editingModule) {
-        // تعديل الموديل
-        await api.put(`/api/admin/modules/${editingModule.id}`, data);
+        await api.put(`/modules/${editingModule.id}`, data);
         setMessage({ text: 'Module modifié avec succès !', type: 'success' });
       } else {
-        // إضافة موديل جديد
-        await api.post('/api/admin/modules', data);
+        await api.post('/modules', data);
         setMessage({ text: 'Module ajouté avec succès !', type: 'success' });
       }
 
@@ -113,16 +103,14 @@ const ModulesAdmin = () => {
     }
   };
 
-  // فتح مودال تأكيد الحذف
   const confirmDelete = (id) => {
     setDeletingId(id);
     setShowDeleteConfirm(true);
   };
 
-  // تنفيذ الحذف
   const handleDelete = async () => {
     try {
-      await api.delete(`/api/admin/modules/${deletingId}`);
+      await api.delete(`/modules/${deletingId}`);
       setMessage({ text: 'Module supprimé avec succès !', type: 'success' });
       setShowDeleteConfirm(false);
       setDeletingId(null);
@@ -140,10 +128,9 @@ const ModulesAdmin = () => {
 
   return (
     <div className="p-6">
-      {/* رسائل النجاح والخطأ - Toast */}
       {message.text && (
         <div
-          className={`fixed top-6 right-6 z-50 px-6 py-3 rounded-xl shadow-lg text-white font-medium transition-all duration-300 ${
+          className={`fixed top-6 right-6 z-[60] px-6 py-3 rounded-xl shadow-lg text-white font-medium transition-all duration-300 ${
             message.type === 'success'
               ? 'bg-gradient-to-r from-green-500 to-emerald-600'
               : 'bg-gradient-to-r from-red-500 to-rose-600'
@@ -164,7 +151,6 @@ const ModulesAdmin = () => {
         </div>
       )}
 
-      {/* الهيدر ديال الصفحة */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
         <div>
           <div className="flex items-center gap-3">
@@ -190,14 +176,12 @@ const ModulesAdmin = () => {
         </button>
       </div>
 
-      {/* حالة التحميل */}
       {loading ? (
         <div className="flex flex-col items-center justify-center py-20">
           <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
           <p className="mt-4 text-gray-500 font-medium">Chargement des modules...</p>
         </div>
       ) : modules.length === 0 ? (
-        // حالة ماكاين حتى موديل
         <div className="flex flex-col items-center justify-center py-20 bg-white rounded-2xl border border-gray-100 shadow-sm">
           <div className="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mb-4">
             <svg className="w-10 h-10 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -214,45 +198,29 @@ const ModulesAdmin = () => {
           </button>
         </div>
       ) : (
-        // الجدول ديال الموديلات
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="bg-gradient-to-r from-gray-50 to-gray-100/50">
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    #
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Nom
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Filière
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Niveau
-                  </th>
-                  <th className="px-6 py-4 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Actions
-                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">#</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Nom</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Filière</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Niveau</th>
+                  <th className="px-6 py-4 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
                 {modules.map((mod, index) => (
-                  <tr
-                    key={mod.id}
-                    className="hover:bg-blue-50/40 transition-colors duration-150 group"
-                  >
+                  <tr key={mod.id} className="hover:bg-blue-50/40 transition-colors duration-150 group">
                     <td className="px-6 py-4">
                       <span className="text-sm font-medium text-gray-400">{index + 1}</span>
                     </td>
                     <td className="px-6 py-4">
                       <div>
-                        <p className="text-sm font-semibold text-gray-800">{mod.nom}</p>
+                        <p className="text-sm font-semibold text-gray-800">{mod.titre || mod.nom}</p>
                         {mod.description && (
-                          <p className="text-xs text-gray-400 mt-0.5 truncate max-w-xs">
-                            {mod.description}
-                          </p>
+                          <p className="text-xs text-gray-400 mt-0.5 truncate max-w-xs">{mod.description}</p>
                         )}
                       </div>
                     </td>
@@ -299,22 +267,13 @@ const ModulesAdmin = () => {
       {/* مودال الإضافة / التعديل */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          {/* الخلفية المعتمة */}
-          <div
-            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
-            onClick={closeModal}
-          ></div>
-
-          {/* محتوى المودال */}
-          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6 animate-in">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={closeModal}></div>
+          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-bold text-gray-800" style={{ fontFamily: 'Outfit, sans-serif' }}>
                 {editingModule ? 'Modifier le Module' : 'Ajouter un Module'}
               </h2>
-              <button
-                onClick={closeModal}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-              >
+              <button onClick={closeModal} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
                 <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -322,7 +281,6 @@ const ModulesAdmin = () => {
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
-              {/* حقل الاسم */}
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1.5">
                   Nom du module <span className="text-red-400">*</span>
@@ -332,16 +290,12 @@ const ModulesAdmin = () => {
                   value={nom}
                   onChange={(e) => setNom(e.target.value)}
                   required
-                  placeholder="Ex: Mathématiques appliquées"
                   className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all duration-200 text-sm"
                 />
               </div>
 
-              {/* حقل الوصف */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-                  Description
-                </label>
+                <label className="block text-sm font-semibold text-gray-700 mb-1.5">Description</label>
                 <textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
@@ -351,7 +305,6 @@ const ModulesAdmin = () => {
                 />
               </div>
 
-              {/* حقل الفيليار */}
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1.5">
                   Filière <span className="text-red-400">*</span>
@@ -371,7 +324,6 @@ const ModulesAdmin = () => {
                 </select>
               </div>
 
-              {/* حقل المستوى */}
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1.5">
                   Niveau <span className="text-red-400">*</span>
@@ -388,7 +340,6 @@ const ModulesAdmin = () => {
                 </select>
               </div>
 
-              {/* أزرار الأكسيون */}
               <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-100">
                 <button
                   type="button"
@@ -412,13 +363,7 @@ const ModulesAdmin = () => {
       {/* مودال تأكيد الحذف */}
       {showDeleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          {/* الخلفية المعتمة */}
-          <div
-            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
-            onClick={() => setShowDeleteConfirm(false)}
-          ></div>
-
-          {/* محتوى المودال */}
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowDeleteConfirm(false)}></div>
           <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6">
             <div className="flex flex-col items-center text-center">
               <div className="w-14 h-14 bg-red-100 rounded-full flex items-center justify-center mb-4">

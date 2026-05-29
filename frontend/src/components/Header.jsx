@@ -48,6 +48,9 @@ const Header = () => {
             <Link to="/admin/quizzes" className="text-gray-700 hover:text-blue-600 text-xs font-normal flex items-center gap-1.5">
               <HelpCircle className="w-3.5 h-3.5 text-black" /> Quizzes
             </Link>
+            <Link to="/admin/examens" className="text-gray-700 hover:text-blue-600 text-xs font-normal flex items-center gap-1.5">
+              <FileText className="w-3.5 h-3.5 text-black" /> Examens
+            </Link>
             <Link to="/admin/lessons" className="text-gray-700 hover:text-blue-600 text-xs font-normal flex items-center gap-1.5">
               <FileText className="w-3.5 h-3.5 text-black" /> Leçons
             </Link>

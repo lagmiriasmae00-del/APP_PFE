@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import api from '../../api/axios';
+// استيراد الأيقونات العصرية والنقية 🖤
+import { GraduationCap, BookOpen, FileText, AlertTriangle, RefreshCw, BarChart3, ShieldCheck } from 'lucide-react';
 
 // هاد الصفحة هي الـ Dashboard ديال الأدمين
 // كتعرض الإحصائيات ديال الفيليارات والموديلات والامتحانات
-
 const AdminDashboard = () => {
   const { user } = useSelector((state) => state.auth);
   const [stats, setStats] = useState({ filieres: 0, modules: 0, examens: 0 });
@@ -41,7 +42,7 @@ const AdminDashboard = () => {
     fetchStats();
   }, []);
 
-  // سبينر ديال التحميل
+  // سبينر ديال التحميل (معدل بـ Style نقي)
   if (loading) {
     return (
       <div className="flex flex-col justify-center items-center h-[60vh] gap-4">
@@ -51,32 +52,33 @@ const AdminDashboard = () => {
     );
   }
 
-  // رسالة الخطأ
+  // رسالة الخطأ (معدلة بـ الأيقونة العصرية)
   if (error) {
     return (
       <div className="flex flex-col justify-center items-center h-[60vh] gap-4">
-        <div className="p-4 bg-red-50 text-red-600 rounded-2xl border border-red-100 max-w-md text-center">
-          <span className="text-3xl block mb-3">⚠️</span>
-          <p className="font-semibold mb-1">Erreur</p>
-          <p className="text-sm">{error}</p>
+        <div className="p-6 bg-red-50 text-red-600 rounded-2xl border border-red-100 max-w-md text-center shadow-sm">
+          <div className="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-3">
+            <AlertTriangle className="w-6 h-6" />
+          </div>
+          <p className="font-semibold mb-1 text-gray-900">Erreur</p>
+          <p className="text-sm text-gray-600 mb-4">{error}</p>
           <button
             onClick={() => window.location.reload()}
-            className="mt-4 px-6 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 transition-colors cursor-pointer"
+            className="inline-flex items-center gap-2 px-6 py-2 bg-red-600 text-white rounded-xl text-sm font-medium hover:bg-red-700 transition-colors cursor-pointer shadow-sm"
           >
-            Réessayer
+            <RefreshCw className="w-4 h-4" /> Réessayer
           </button>
         </div>
       </div>
     );
   }
 
-  // الكروت ديال الإحصائيات
+  // الكروت ديال الإحصائيات مع الأيقونات الجداد الكحلين 🖤
   const statCards = [
     {
       label: 'Total Filières',
       count: stats.filieres,
-      icon: '🎓',
-      color: 'blue',
+      icon: <GraduationCap className="w-6 h-6" />,
       bgLight: 'bg-blue-50',
       textColor: 'text-blue-600',
       hoverBg: 'group-hover:bg-blue-100',
@@ -85,8 +87,7 @@ const AdminDashboard = () => {
     {
       label: 'Total Modules',
       count: stats.modules,
-      icon: '📚',
-      color: 'green',
+      icon: <BookOpen className="w-6 h-6" />,
       bgLight: 'bg-green-50',
       textColor: 'text-green-600',
       hoverBg: 'group-hover:bg-green-100',
@@ -95,8 +96,7 @@ const AdminDashboard = () => {
     {
       label: 'Total Examens',
       count: stats.examens,
-      icon: '📝',
-      color: 'orange',
+      icon: <FileText className="w-6 h-6" />,
       bgLight: 'bg-orange-50',
       textColor: 'text-orange-600',
       hoverBg: 'group-hover:bg-orange-100',
@@ -105,22 +105,24 @@ const AdminDashboard = () => {
   ];
 
   return (
-    <div className="max-w-7xl mx-auto">
+    <div className="max-w-7xl mx-auto p-4 md:p-6">
 
       {/* === قسم الترحيب === */}
       <div className="mb-10">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight" style={{ fontFamily: 'Outfit, sans-serif' }}>
-              Bienvenue, <span className="text-indigo-600">{user?.name || 'Admin'}</span> 👋
+              Bienvenue, <span className="text-indigo-600">{user?.name || 'Admin EduLink'}</span> 👋
             </h1>
             <p className="text-gray-500 mt-1">
               Voici un aperçu global de votre plateforme EduLink.
             </p>
           </div>
-          <div className="bg-white px-4 py-2 rounded-lg shadow-sm border border-gray-100 flex items-center gap-2">
-            <span className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></span>
-            <span className="text-sm font-medium text-gray-600">Statut: Système Actif</span>
+          
+          {/* Statut Système */}
+          <div className="flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-200 rounded-full shadow-sm self-start md:self-center">
+            <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+            <span className="text-xs font-normal text-gray-600">Statut: Système Actif</span>
           </div>
         </div>
       </div>
@@ -137,16 +139,17 @@ const AdminDashboard = () => {
             <div className={`absolute top-0 right-0 w-24 h-24 ${card.bgLight} rounded-bl-full -mr-10 -mt-10 transition-all ${card.hoverBg}`}></div>
             
             <div className="relative">
-              <div className={`p-3 ${card.bgLight} ${card.textColor} rounded-lg w-fit mb-4`}>
-                <span className="text-2xl">{card.icon}</span>
+              {/* الأيقونة العصرية بلون أسود داخل خلفية خفيفة */}
+              <div className={`p-3 ${card.bgLight} text-black rounded-xl w-fit mb-4`}>
+                {card.icon}
               </div>
-              <h3 className="text-gray-600 font-semibold uppercase text-xs tracking-wider">
+              <h3 className="text-gray-400 font-bold uppercase text-[10px] tracking-wider">
                 {card.label}
               </h3>
               <p className="text-4xl font-black text-gray-900 mt-2">
                 {card.count}
               </p>
-              <p className={`mt-3 text-sm ${card.textColor} font-medium`}>
+              <p className={`mt-3 text-xs ${card.textColor} font-medium`}>
                 {card.description}
               </p>
             </div>
@@ -154,27 +157,28 @@ const AdminDashboard = () => {
         ))}
       </div>
 
-      {/* === بانر معلوماتي فالأسفل === */}
+      {/* === بانر معلوماتي فالأسفل مع الـ الأيقونات النقيين === */}
       <div className="bg-gradient-to-r from-indigo-600 to-violet-700 p-8 rounded-3xl shadow-xl text-white relative overflow-hidden">
         <div className="relative z-10">
           <h2 className="text-xl font-bold mb-2" style={{ fontFamily: 'Outfit, sans-serif' }}>
             Gestion de la Plateforme
           </h2>
-          <p className="opacity-90 leading-relaxed max-w-2xl">
-            Vous gérez actuellement <span className="font-bold">{stats.filieres} filières</span>, <span className="font-bold">{stats.modules} modules</span> et <span className="font-bold">{stats.examens} examens</span>.
+          <p className="opacity-90 text-sm leading-relaxed max-w-2xl font-normal">
+            Vous gerez actuellement <span className="font-semibold">{stats.filieres} filières</span>, <span className="font-semibold">{stats.modules} modules</span> et <span className="font-semibold">{stats.examens} examens</span>.
             Utilisez le menu latéral pour accéder à chaque section.
           </p>
+          
           <div className="flex flex-wrap gap-3 mt-6">
-            <span className="bg-white/20 px-4 py-1.5 rounded-full text-sm font-medium backdrop-blur-sm">
-              📊 Statistiques en temps réel
+            <span className="inline-flex items-center gap-2 bg-white/10 px-4 py-2 rounded-xl text-xs font-normal backdrop-blur-sm border border-white/10">
+              <BarChart3 className="w-3.5 h-3.5 text-white" /> Statistiques en temps réel
             </span>
-            <span className="bg-white/20 px-4 py-1.5 rounded-full text-sm font-medium backdrop-blur-sm">
-              🔒 Accès sécurisé
+            <span className="inline-flex items-center gap-2 bg-white/10 px-4 py-2 rounded-xl text-xs font-normal backdrop-blur-sm border border-white/10">
+              <ShieldCheck className="w-3.5 h-3.5 text-white" /> Accès sécurisé
             </span>
           </div>
         </div>
-        {/* دائرة ديكوراتيف */}
-        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-32 -mt-32"></div>
+        {/* دوائر ديكوراتيف */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-32 -mt-32"></div>
         <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/5 rounded-full -ml-16 -mb-16"></div>
       </div>
     </div>

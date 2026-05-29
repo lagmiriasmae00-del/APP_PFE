@@ -354,7 +354,7 @@ const ExamensAdmin = () => {
                     <option value="">-- Sélectionner un module --</option>
                     {modules.map((mod) => (
                       <option key={mod.id} value={mod.id}>
-                        {mod.nom}
+                        {mod.titre || mod.nom}
                       </option>
                     ))}
                   </select>

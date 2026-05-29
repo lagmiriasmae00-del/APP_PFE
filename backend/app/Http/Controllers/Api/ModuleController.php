@@ -17,15 +17,20 @@ class ModuleController extends Controller
     {
         $user = auth()->user();
         
-        // إذا كان أدمين، كيشوف الموديلات كاملين
-        if ($user->profile && $user->profile->role === 'admin') {
+        // تعديل الشرط: إذا كان الـ role ف الـ user نيشان أو ف الـ profile
+        $isAdmin = ($user->role === 'admin') || ($user->profile && $user->profile->role === 'admin');
+
+        if ($isAdmin) {
             $modules = Module::with(['filiere', 'quizzes', 'lessons'])->get();
             return response()->json($modules);
         }
         
         // للطالب: تصفية حسب الشعبة والمستوى
-        $modules = Module::where('filiere_id', $user->profile->filiere_id)
-                    ->where('niveau', $user->profile->niveau)
+        $filiere_id = $user->profile ? $user->profile->filiere_id : null;
+        $niveau = $user->profile ? $user->profile->niveau : null;
+
+        $modules = Module::where('filiere_id', $filiere_id)
+                    ->where('niveau', $niveau)
                     ->with(['filiere', 'quizzes', 'lessons'])
                     ->get();
 
@@ -33,44 +38,18 @@ class ModuleController extends Controller
     }
 
     /**
-     * Get module details (Admin sees all, Stagiaire filtered)
-     */
-    public function show(int $id): JsonResponse
-    {
-        $user = auth()->user();
-
-        // إذا كان أدمين، كيشوف الموديل بلا شروط التصفية
-        if ($user->profile && $user->profile->role === 'admin') {
-            $module = Module::with([
-                'lessons.videos',
-                'quizzes.questions.choices',
-                'documents.files'
-            ])->findOrFail($id);
-            
-            return response()->json($module);
-        }
-
-        // للطالب: كنجيبو الموديل بشرط يكون ديالو
-        $module = Module::with([
-            'lessons.videos',
-            'quizzes.questions.choices',
-            'documents.files'
-        ])
-        ->where('filiere_id', $user->profile->filiere_id)
-        ->where('niveau', $user->profile->niveau)
-        ->findOrFail($id);
-
-        return response()->json($module);
-    }
-
-    /**
      * Create a new module (admin only)
      */
     public function store(Request $request): JsonResponse
     {
+        // ردينا 'titre' كيقبل القيمة ديال 'nom' إذا جات من الـ Front-end
+        if ($request->has('nom') && !$request->has('titre')) {
+            $request->merge(['titre' => $request->nom]);
+        }
+
         $validated = $request->validate([
             'titre' => 'required|string|max:255',
-            'niveau' => 'required|integer|in:1,2', // تعويض مباشر
+            'niveau' => 'required|integer|in:1,2', 
             'filiere_id' => 'required|integer|exists:filieres,id',
             'description' => 'nullable|string'
         ]);
@@ -95,9 +74,13 @@ class ModuleController extends Controller
     {
         $module = Module::findOrFail($id);
 
+        if ($request->has('nom') && !$request->has('titre')) {
+            $request->merge(['titre' => $request->nom]);
+        }
+
         $validated = $request->validate([
             'titre' => 'sometimes|string|max:255',
-            'niveau' => 'sometimes|integer|in:1,2', // تعويض مباشر
+            'niveau' => 'sometimes|integer|in:1,2', 
             'filiere_id' => 'sometimes|integer|exists:filieres,id',
             'description' => 'sometimes|nullable|string'
         ]);

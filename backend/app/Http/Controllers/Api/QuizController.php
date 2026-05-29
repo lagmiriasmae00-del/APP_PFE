@@ -143,19 +143,44 @@ class QuizController extends Controller
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'titre' => 'required|string|max:255',
-            'module_id' => 'required|integer|exists:modules,id',
-            'description' => 'nullable|string'
+            'titre'       => 'required|string|max:255',
+            'module_id'   => 'required|integer|exists:modules,id',
+            'questions'   => 'nullable|array',
+            'questions.*.question'              => 'required_with:questions|string',
+            'questions.*.point'                 => 'nullable|integer|min:1',
+            'questions.*.choices'               => 'nullable|array',
+            'questions.*.choices.*.text_choix'  => 'required_with:questions.*.choices|string',
+            'questions.*.choices.*.est_correcte'=> 'nullable|boolean',
         ]);
 
-        $quiz = Quizze::create($validated);
+        return DB::transaction(function () use ($validated) {
+            $quiz = Quizze::create([
+                'titre'     => $validated['titre'],
+                'module_id' => $validated['module_id'],
+            ]);
 
-        Log::info('Quiz created', [
-            'quiz_id' => $quiz->id,
-            'admin_id' => auth()->id()
-        ]);
+            foreach ($validated['questions'] ?? [] as $qData) {
+                $question = $quiz->questions()->create([
+                    'question' => $qData['question'],
+                    'point'    => $qData['point'] ?? 1,
+                ]);
 
-        return response()->json($quiz, 201);
+                foreach ($qData['choices'] ?? [] as $cData) {
+                    $question->choices()->create([
+                        'text_choix'  => $cData['text_choix'],
+                        'est_correcte'=> $cData['est_correcte'] ?? false,
+                    ]);
+                }
+            }
+
+            Log::info('Quiz created with questions', [
+                'quiz_id'  => $quiz->id,
+                'admin_id' => auth()->id(),
+                'questions_count' => count($validated['questions'] ?? []),
+            ]);
+
+            return response()->json($quiz->load('questions.choices'), 201);
+        });
     }
 
     public function update(Request $request, int $id): JsonResponse

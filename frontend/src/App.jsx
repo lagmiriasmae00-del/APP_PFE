@@ -19,6 +19,7 @@ import Profile from './pages/Profile';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import ModulesAdmin from './pages/admin/ModulesAdmin';
 import ExamensAdmin from './pages/admin/ExamensAdmin';
+import QuizzesAdmin from './pages/admin/QuizzesAdmin';
 import DocumentsAdmin from './pages/admin/DocumentsAdmin';
 import FilieresAdmin from './pages/admin/FilieresAdmin';
 import UsersAdmin from './pages/admin/UsersAdmin';
@@ -79,7 +80,8 @@ function App() {
           {/* === روابط الـ Admin المحمية (بقت بنفس العناوين وبدون Sidebar) 🔐 === */}
           <Route path="admin" element={isAuthenticated ? <AdminDashboard /> : <Navigate to="/login" />} />
           <Route path="admin/modules" element={isAuthenticated ? <ModulesAdmin /> : <Navigate to="/login" />} />
-          <Route path="admin/quizzes" element={isAuthenticated ? <ExamensAdmin /> : <Navigate to="/login" />} />
+          <Route path="admin/quizzes" element={isAuthenticated ? <QuizzesAdmin /> : <Navigate to="/login" />} />
+          <Route path="admin/examens" element={isAuthenticated ? <ExamensAdmin /> : <Navigate to="/login" />} />
           <Route path="admin/documents" element={isAuthenticated ? <DocumentsAdmin /> : <Navigate to="/login" />} />
           <Route path="admin/filieres" element={isAuthenticated ? <FilieresAdmin /> : <Navigate to="/login" />} />
           <Route path="admin/users" element={isAuthenticated ? <UsersAdmin /> : <Navigate to="/login" />} />

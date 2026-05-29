@@ -18,9 +18,10 @@ const LessonsAdmin = () => {
   
   const [message, setMessage] = useState({ text: '', type: '' });
 
+  // 🛠️ تصحيح الـ URL هنا: حيدنا /api/admin/ ورجعناها غير /lessons
   const fetchLessons = async () => {
     try {
-      const response = await api.get('/api/admin/lessons');
+      const response = await api.get('/admin/lessons'); 
       setLessons(response.data);
     } catch (error) {
       console.error('Erreur de chargement des leçons:', error);
@@ -28,9 +29,10 @@ const LessonsAdmin = () => {
     }
   };
 
+  // 🛠️ تصحيح الـ URL هنا: حيدنا /api/admin/ ورجعناها غير /modules
   const fetchModules = async () => {
     try {
-      const response = await api.get('/api/admin/modules');
+      const response = await api.get('/admin/modules');
       setModules(response.data);
     } catch (error) {
       console.error('Erreur de chargement des modules:', error);
@@ -57,7 +59,7 @@ const LessonsAdmin = () => {
     setTitre(lesson.titre);
     setContenu(lesson.contenu || '');
     setModuleId(lesson.module_id);
-    setPdfFile(null); // Keep null unless user uploads new file
+    setPdfFile(null); 
     setVideos(lesson.videos?.length > 0 ? lesson.videos.map(v => ({ video_url: v.video_url, order: v.order })) : [{ video_url: '', order: 1 }]);
     setMessage({ text: '', type: '' });
     setShowModal(true);
@@ -75,7 +77,6 @@ const LessonsAdmin = () => {
 
   const removeVideoField = (index) => {
     const newVideos = videos.filter((_, i) => i !== index);
-    // Reorder
     newVideos.forEach((v, i) => { v.order = i + 1; });
     setVideos(newVideos);
   };
@@ -83,7 +84,6 @@ const LessonsAdmin = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Validate
     if (!titre || !moduleId) {
       setMessage({ text: 'Veuillez remplir les champs obligatoires (Titre, Module)', type: 'error' });
       return;
@@ -96,23 +96,20 @@ const LessonsAdmin = () => {
       if (contenu) formData.append('contenu', contenu);
       if (pdfFile) formData.append('pdf_file', pdfFile);
 
-      // Filtering out empty videos
       const validVideos = videos.filter(v => v.video_url.trim() !== '');
       
       if (editingLesson) {
-        // Update (Simulation since API expects PUT but with FormData we often need POST + _method=PUT)
         formData.append('_method', 'PUT');
-        await api.post(`/api/lessons/${editingLesson.id}`, formData, {
+        await api.post(`/lessons/${editingLesson.id}`, formData, {
           headers: { 'Content-Type': 'multipart/form-data' }
         });
         setMessage({ text: 'Leçon modifiée avec succès!', type: 'success' });
       } else {
-        // Create
         validVideos.forEach((v, index) => {
           formData.append(`videos[${index}][video_url]`, v.video_url);
           formData.append(`videos[${index}][order]`, v.order);
         });
-        await api.post('/api/lessons', formData, {
+        await api.post('/lessons', formData, {
           headers: { 'Content-Type': 'multipart/form-data' }
         });
         setMessage({ text: 'Leçon ajoutée avec succès!', type: 'success' });
@@ -129,7 +126,7 @@ const LessonsAdmin = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Voulez-vous vraiment supprimer cette leçon ? Cette action supprimera aussi les vidéos associées.')) {
       try {
-        await api.delete(`/api/lessons/${id}`);
+        await api.delete(`/lessons/${id}`);
         setMessage({ text: 'Leçon supprimée!', type: 'success' });
         fetchLessons();
       } catch (error) {
@@ -181,7 +178,7 @@ const LessonsAdmin = () => {
                 <tr key={lesson.id}>
                   <td>{lesson.id}</td>
                   <td><strong>{lesson.titre}</strong></td>
-                  <td>{lesson.module?.nom || 'N/A'}</td>
+                  <td>{lesson.module?.titre || lesson.module?.nom || 'N/A'}</td>
                   <td>
                     <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                       {lesson.pdf_url && <span className="badge badge-pdf">PDF</span>}
@@ -241,7 +238,7 @@ const LessonsAdmin = () => {
                   >
                     <option value="">Sélectionner un module</option>
                     {modules.map(m => (
-                      <option key={m.id} value={m.id}>{m.nom}</option>
+                      <option key={m.id} value={m.id}>{m.titre || m.nom}</option>
                     ))}
                   </select>
                 </div>
@@ -299,7 +296,7 @@ const LessonsAdmin = () => {
                 )}
                 {editingLesson && (
                   <div style={{ marginTop: '16px', fontSize: '13px', color: '#64748b', fontStyle: 'italic' }}>
-                    * Note : L'édition des vidéos se fait pour l'instant via la création. Pour changer les vidéos d'une leçon, il est recommandé de la recréer ou de demander une mise à jour de l'API d'édition des vidéos.
+                    * Note : L'édition des vidéos se fait pour l'instant via la création.
                   </div>
                 )}
               </form>
