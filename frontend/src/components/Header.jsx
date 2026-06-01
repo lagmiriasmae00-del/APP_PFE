@@ -28,13 +28,13 @@ const Header = () => {
     }
   };
 
-  // ✨ دالة الستايل الموحدة للروابط الرئيسية (Accueil, À propos, Mes Modules)
+  
   const activeStyle = ({ isActive }) => 
     `text-sm font-medium flex items-center gap-1.5 transition-colors ${
       isActive ? 'text-blue-600 font-bold' : 'text-gray-500 hover:text-blue-600'
     }`;
 
-  // 🛠️ دالة ستايل مخصصة لروابط الـ Admin باش الحجم ديالها يبقى متناسق (text-xs) وما تخرقش الديزاين
+  
   const adminActiveStyle = ({ isActive }) => 
     `text-xs font-normal flex items-center gap-1.5 transition-colors ${
       isActive ? 'text-blue-600 font-bold' : 'text-gray-700 hover:text-blue-600'
@@ -43,25 +43,25 @@ const Header = () => {
   return (
     <nav className="flex justify-between items-center p-4 bg-white border-b shadow-sm sticky top-0 z-50 h-16">
       
-      {/* اللوغو */}
+      {}
       <div className="logo font-bold text-blue-600 text-2xl tracking-tight">EduLink</div>
       
-      {/* الروابط الوسطى */}
+      {}
       <div className="links space-x-6 flex items-center">
         
-        {/* 🏠 Accueil - خارج الشروط باش تبان ديما بالأيقونة ديالها */}
-        <NavLink to="/" end className={activeStyle}> {/* 🌟 زدنا end هنا تاهيا باش ما يتخلطش مع صفحات خريين */}
+        {}
+        <NavLink to="/" end className={activeStyle}> {}
           <Home className="w-4 h-4" /> 
           <span>Accueil</span>
         </NavLink>
         
-        {/* ℹ️ À propos - خارج الشروط تاهي */}
+        {}
         <NavLink to="/about" className={activeStyle}>
           <Info className="w-4 h-4" /> 
           <span>À propos</span>
         </NavLink>
         
-        {/* 1. روابط الـ Stagiaire (كتظهر فقط للمستخدم العادي) */}
+        {}
         {isAuthenticated && !isAdmin && (
           <>
             <NavLink to="/dashboard" className={activeStyle}>
@@ -75,10 +75,10 @@ const Header = () => {
           </>
         )}
 
-        {/* 2. روابط الـ Admin (كتظهر فقط للـ Admin) */}
+        {}
         {isAdmin && (
           <div className="flex items-center space-x-4 border-l pl-4 border-gray-200">
-            {/* 🌟 التعديل السحري هنا: زدنا خاصية end لـ Dashboard */}
+            {}
             <NavLink to="/admin" end className={adminActiveStyle}>
               <LayoutDashboard className="w-3.5 h-3.5" /> <span>Dashboard</span>
             </NavLink>
@@ -110,7 +110,7 @@ const Header = () => {
         )}
       </div>
 
-      {/* الجهة اليمنى (الأزرار والبروفايل) */}
+      {}
       <div className="auth-buttons flex items-center gap-3">
         {!isAuthenticated ? (
           <>

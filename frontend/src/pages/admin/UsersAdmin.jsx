@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import api from '../../api/axios';
-// 🌟 استيراد الأيقونات الاحترافية من Lucide
+
+
 import { 
   Users, 
   Trash2, 
@@ -76,7 +77,7 @@ const UsersAdmin = () => {
   return (
     <div className="min-h-screen bg-gray-50/50 p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
-        {/* Messages */}
+        {}
         {message.text && (
           <div className={`mb-6 px-5 py-3 rounded-xl text-sm font-medium shadow-sm flex items-center gap-2 transition-all duration-300 ${
               message.type === 'success' ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'
@@ -86,10 +87,10 @@ const UsersAdmin = () => {
           </div>
         )}
 
-        {/* Header */}
+        {}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div className="flex items-center gap-3">
-            {/* 🌟 تصميم احترافي للأيقونة بخلفية خفيفة */}
+            {}
             <div className="p-3 bg-emerald-50 text-emerald-600 rounded-xl shadow-sm border border-emerald-100">
               <Users className="w-6 h-6" />
             </div>
@@ -103,7 +104,7 @@ const UsersAdmin = () => {
           </div>
         </div>
 
-        {/* Table */}
+        {}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
           {users.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20 px-4">
@@ -137,7 +138,7 @@ const UsersAdmin = () => {
                     </td>
                     <td className="px-6 py-4"><span className="text-sm text-gray-600">{user.email}</span></td>
                     <td className="px-6 py-4">
-                      {/* 🌟 هنا التعديل: يلا كان ماشي admin كيطبع stagiaire */}
+                      {}
                       <span className={`text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider ${
                         user.role === 'admin' ? 'bg-purple-100 text-purple-700' : 'bg-emerald-100 text-emerald-700'
                       }`}>
@@ -162,7 +163,7 @@ const UsersAdmin = () => {
           )}
         </div>
 
-        {/* Delete Confirmation Modal */}
+        {}
         {showDeleteConfirm && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => { setShowDeleteConfirm(false); setDeletingId(null); }}></div>

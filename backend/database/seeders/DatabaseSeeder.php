@@ -11,12 +11,11 @@ class DatabaseSeeder extends Seeder
 {
     use WithoutModelEvents;
 
-    /**
-     * Seed the application's database.
-     */
+    
     public function run(): void
     {
-        // === 1. تصفية الجداول عشان التيست يكون نقي ===
+        
+
         DB::statement('SET FOREIGN_KEY_CHECKS=0;');
         DB::table('user_profiles')->truncate();
         DB::table('users')->truncate();
@@ -27,16 +26,19 @@ class DatabaseSeeder extends Seeder
         DB::table('document_files')->truncate();
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
-        // === 2. Création dial l-compte f la table 'users' ===
+        
+
         $userId = DB::table('users')->insertGetId([
             'name' => 'Admin EduLink',
             'email' => 'admin@edulink.com',
-            'password' => bcrypt('admin'), // المودپاص هو admin
+            'password' => bcrypt('admin'), 
+
             'created_at' => now(),
             'updated_at' => now(),
         ]);
 
-        // === 3. Création dial l-profil f la table 'user_profiles' ===
+        
+
         DB::table('user_profiles')->insert([
             'nom' => 'EduLink',
             'prenom' => 'Admin',
@@ -48,7 +50,8 @@ class DatabaseSeeder extends Seeder
             'updated_at' => now(),
         ]);
 
-        // === 4. Création dial les Filières ===
+        
+
         $filiereDevId = DB::table('filieres')->insertGetId([
             'nom' => 'Développement Digital',
             'created_at' => now(),
@@ -61,7 +64,8 @@ class DatabaseSeeder extends Seeder
             'updated_at' => now(),
         ]);
 
-        // === 5. Création dial les Modules ===
+        
+
         $moduleReactId = DB::table('modules')->insertGetId([
             'filiere_id'  => $filiereDevId,
             'titre'       => 'Développement Front-end avec React',
@@ -89,7 +93,8 @@ class DatabaseSeeder extends Seeder
             'updated_at'  => now(),
         ]);
 
-        // === 6. Création dial les Leçons ===
+        
+
         DB::table('lessons')->insert([
             'module_id'  => $moduleReactId,
             'titre'      => 'Introduction aux Components et Props',
@@ -106,7 +111,8 @@ class DatabaseSeeder extends Seeder
             'updated_at' => now(),
         ]);
 
-        // === 7. Création dial les Documents ===
+        
+
         $documentId = DB::table('documents')->insertGetId([
             'titre' => 'Examen National React 2025',
             'type' => 'efm',
@@ -118,7 +124,8 @@ class DatabaseSeeder extends Seeder
             'updated_at' => now(),
         ]);
 
-        // === 8. Création dial les Document Files ===
+        
+
         DB::table('document_files')->insert([
             'file_url' => 'uploads/documents/efm_react_2025.pdf',
             'file_type' => 'pdf',

@@ -1,4 +1,4 @@
-/* eslint-disable */
+
 import { useState, useEffect } from 'react';
 import api from '../../api/axios';
 
@@ -22,6 +22,26 @@ const DocumentsAdmin = () => {
   const [message, setMessage] = useState({ text: '', type: '' });
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
+  const [downloading, setDownloading] = useState(null);
+
+  const handleDownload = async (fileId, fileName) => {
+    setDownloading(fileId);
+    try {
+      const response = await api.get(`/files/${fileId}/download`, { responseType: 'blob' });
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `${fileName}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch {
+      alert('Erreur lors du téléchargement du fichier.');
+    } finally {
+      setDownloading(null);
+    }
+  };
 
   const fetchDocuments = async () => {
     try {
@@ -81,7 +101,20 @@ const DocumentsAdmin = () => {
   };
 
   const openEditModal = (doc) => {
-    alert("La modification n'est pas encore supportée par le backend.");
+    setEditingDoc(doc);
+    setTitre(doc.titre);
+    setType(doc.type);
+    setNiveau(doc.niveau.toString());
+    setYear(doc.annee || doc.year);
+    setFiliereId(doc.filiere_id);
+    setModuleId(doc.module_id);
+    setFile(null);
+    if (doc.files && doc.files.length > 0) {
+      setFileType(doc.files[0].file_type);
+    } else {
+      setFileType('Exercice');
+    }
+    setShowModal(true);
   };
 
   const closeModal = () => {
@@ -93,7 +126,7 @@ const DocumentsAdmin = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!file) {
+    if (!editingDoc && !file) {
       setMessage({ text: 'Veuillez sélectionner un fichier PDF.', type: 'error' });
       return;
     }
@@ -107,9 +140,17 @@ const DocumentsAdmin = () => {
       formData.append('filiere_id', filiere_id);
       formData.append('module_id', module_id);
       formData.append('file_type', file_type);
-      formData.append('file', file);
+      if (file) {
+        formData.append('file', file);
+      }
 
-      if (!editingDoc) {
+      if (editingDoc) {
+        formData.append('_method', 'PUT');
+        await api.post(`/documents/${editingDoc.id}`, formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        setMessage({ text: 'Document modifié avec succès !', type: 'success' });
+      } else {
         await api.post('/documents', formData, {
           headers: { 'Content-Type': 'multipart/form-data' }
         });
@@ -211,20 +252,21 @@ const DocumentsAdmin = () => {
                       <div className="flex flex-wrap gap-2">
                         {doc.files && doc.files.length > 0 ? (
                           doc.files.map((docFile) => (
-                            <a 
+                            <button 
                               key={docFile.id} 
-                              href={`http://localhost:8000/api/files/${docFile.id}/download`} 
-                              target="_blank" 
-                              rel="noreferrer"
+                              onClick={() => handleDownload(docFile.id, doc.titre)}
+                              disabled={downloading === docFile.id}
                               className={`inline-flex items-center px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all hover:-translate-y-0.5 ${
+                                downloading === docFile.id ? 'opacity-50 cursor-not-allowed ' : ''
+                              }${
                                 docFile.file_type === 'Exercice' ? 'bg-blue-100 text-blue-700 hover:bg-blue-200' :
                                 docFile.file_type === 'Correction' ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200' :
                                 'bg-purple-100 text-purple-700 hover:bg-purple-200'
                               }`}
                               title="Télécharger"
                             >
-                              ↓ {docFile.file_type}
-                            </a>
+                              {downloading === docFile.id ? '⏳' : '↓'} {docFile.file_type}
+                            </button>
                           ))
                         ) : (
                           <span className="text-xs text-gray-400 italic">Aucun fichier</span>

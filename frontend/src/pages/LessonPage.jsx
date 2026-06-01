@@ -1,12 +1,16 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import api from '../api/axios';
-// 🌟 استيراد الأيقونات الخطية النقية من Lucide
+
+
 import { BookOpen, AlertTriangle, Video, FileText, ArrowLeft, Loader2, Play } from 'lucide-react';
 
-// ─────────────────────────────────────────────
-// 🎬 Composant : Lecteur Vidéo / Embed
-// ─────────────────────────────────────────────
+
+
+
+
+
+
 const VideoPlayer = ({ video }) => {
   const getYouTubeId = (url) => {
     const match = url?.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/))([a-zA-Z0-9_-]{11})/);
@@ -38,9 +42,12 @@ const VideoPlayer = ({ video }) => {
   );
 };
 
-// ─────────────────────────────────────────────
-// 📖 Page : Détail d'une Leçon
-// ─────────────────────────────────────────────
+
+
+
+
+
+
 const LessonPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -66,7 +73,8 @@ const LessonPage = () => {
     loadLesson();
   }, [id]);
 
-  // ── État : Chargement ──
+  
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50/50 flex items-center justify-center">
@@ -78,7 +86,8 @@ const LessonPage = () => {
     );
   }
 
-  // ── État : Erreur (مع تعويض إيموجي التحذير) ──
+  
+
   if (error || !lesson) {
     return (
       <div className="min-h-screen bg-gray-50/50 flex flex-col items-center justify-center p-6 text-center">
@@ -104,7 +113,7 @@ const LessonPage = () => {
     <div className="min-h-screen bg-gray-50/50 p-4 md:p-8">
       <div className="max-w-5xl mx-auto space-y-6">
 
-        {/* ── Fil d'Ariane ── */}
+        {}
         <nav className="flex items-center gap-2 text-xs font-semibold text-gray-400 flex-wrap">
           <Link to="/modules" className="hover:text-blue-600 transition">Modules</Link>
           <span>/</span>
@@ -119,7 +128,7 @@ const LessonPage = () => {
           <span className="text-gray-800 truncate max-w-[200px]">{lesson.titre}</span>
         </nav>
 
-        {/* ── En-tête de la leçon (حيدنا الإيموجي ورجع Badge نقي) ── */}
+        {}
         <div className="space-y-3">
           <div className="inline-flex items-center gap-1.5 bg-blue-50 text-blue-700 text-[10px] font-black px-2.5 py-1 rounded-md uppercase tracking-wider border border-blue-100/50">
             <BookOpen className="w-3 h-3" />
@@ -134,15 +143,15 @@ const LessonPage = () => {
           )}
         </div>
 
-        {/* ── Zone Vidéo ── */}
+        {}
         {videos.length > 0 ? (
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-            {/* Lecteur principal */}
+            {}
             <div className="p-4 bg-gray-950">
               <VideoPlayer video={currentVideo} />
             </div>
 
-            {/* Titre de la vidéo active */}
+            {}
             <div className="px-6 py-4 border-b border-gray-50">
               <p className="text-[10px] text-blue-600 font-bold uppercase tracking-wider mb-0.5">
                 Vidéo {activeVideoIndex + 1} sur {videos.length}
@@ -150,7 +159,7 @@ const LessonPage = () => {
               <h2 className="text-base font-bold text-gray-900">{currentVideo.titre || `Vidéo ${activeVideoIndex + 1}`}</h2>
             </div>
 
-            {/* Playlist */}
+            {}
             {videos.length > 1 && (
               <div className="p-6 bg-gray-50/30">
                 <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-3">Playlist</p>
@@ -186,7 +195,7 @@ const LessonPage = () => {
           </div>
         )}
 
-        {/* ── Contenu texte de la leçon ── */}
+        {}
         {lesson.contenu && (
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-8">
             <h3 className="text-sm font-bold text-gray-900 mb-4 flex items-center gap-2 border-b border-gray-50 pb-3">
@@ -200,7 +209,7 @@ const LessonPage = () => {
           </div>
         )}
 
-        {/* ── Navigation de retour ── */}
+        {}
         <div className="pt-2">
           <button
             onClick={() => navigate(-1)}

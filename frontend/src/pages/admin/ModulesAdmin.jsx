@@ -1,4 +1,4 @@
-/* eslint-disable */
+
 import { useState, useEffect } from 'react';
 import api from '../../api/axios';
 
@@ -16,7 +16,8 @@ const ModulesAdmin = () => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
 
-  // جلب الموديلات - تصحيح الـ Route تماثلاً مع الـ Dashboard
+  
+
   const fetchModules = async () => {
     try {
       setLoading(true);
@@ -30,7 +31,8 @@ const ModulesAdmin = () => {
     }
   };
 
-  // جلب الفيليارات - تصحيح الـ Route
+  
+
   const fetchFilieres = async () => {
     try {
       const response = await api.get('/admin/filieres');
@@ -63,7 +65,8 @@ const ModulesAdmin = () => {
 
   const openEditModal = (mod) => {
     setEditingModule(mod);
-    setNom(mod.titre || mod.nom || ''); // دعم الإسمين معاً
+    setNom(mod.titre || mod.nom || ''); 
+
     setDescription(mod.description || '');
     setFiliereId(mod.filiere_id);
     setNiveau(mod.niveau);
@@ -264,7 +267,7 @@ const ModulesAdmin = () => {
         </div>
       )}
 
-      {/* مودال الإضافة / التعديل */}
+      {}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={closeModal}></div>
@@ -360,7 +363,7 @@ const ModulesAdmin = () => {
         </div>
       )}
 
-      {/* مودال تأكيد الحذف */}
+      {}
       {showDeleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowDeleteConfirm(false)}></div>

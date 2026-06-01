@@ -9,7 +9,8 @@ const LessonsAdmin = () => {
   const [showModal, setShowModal] = useState(false);
   const [editingLesson, setEditingLesson] = useState(null);
   
-  // Form States
+  
+
   const [titre, setTitre] = useState('');
   const [contenu, setContenu] = useState('');
   const [moduleId, setModuleId] = useState('');
@@ -18,7 +19,8 @@ const LessonsAdmin = () => {
   
   const [message, setMessage] = useState({ text: '', type: '' });
 
-  // 🛠️ تصحيح الـ URL هنا: حيدنا /api/admin/ ورجعناها غير /lessons
+  
+
   const fetchLessons = async () => {
     try {
       const response = await api.get('/admin/lessons'); 
@@ -29,7 +31,8 @@ const LessonsAdmin = () => {
     }
   };
 
-  // 🛠️ تصحيح الـ URL هنا: حيدنا /api/admin/ ورجعناها غير /modules
+  
+
   const fetchModules = async () => {
     try {
       const response = await api.get('/admin/modules');

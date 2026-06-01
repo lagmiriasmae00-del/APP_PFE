@@ -4,16 +4,16 @@ import api from '../api/axios';
 import '../styles/Quiz.css';
 import { Trophy, XCircle } from 'lucide-react';
 
-// القراءة من URL عبر /quiz/:id
+
 const QuizPage = () => {
-    const { id: quizId } = useParams(); // ← يقرأ الـ ID من الـ URL
+    const { id: quizId } = useParams(); 
     const [quiz, setQuiz] = useState(null);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [userAnswers, setUserAnswers] = useState({});
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [results, setResults] = useState(null);
     const [submitError, setSubmitError] = useState(null);
-    // جلب بيانات الكويز
+    
     useEffect(() => {
         api.get(`/quizzes/${quizId}`)
             .then(res => setQuiz(res.data))
@@ -54,7 +54,7 @@ const QuizPage = () => {
     const submitQuiz = () => {
         setIsSubmitting(true);
         setSubmitError(null);
-        // ✅ الـ route الصحيح هو /quiz/:id/submit (بالمفرد)
+        
         api.post(`/quiz/${quizId}/submit`, { answers: userAnswers })
             .then(res => setResults(res.data))
             .catch(err => {
@@ -65,7 +65,7 @@ const QuizPage = () => {
             .finally(() => setIsSubmitting(false));
     };
 
-    // واجهة النتائج
+    
     if (results) {
         return (
             <div className="flex justify-center p-6">
@@ -95,7 +95,7 @@ const QuizPage = () => {
         <div className="min-h-screen bg-gray-50 p-4 md:p-10 flex justify-center">
             <div className="quiz-container w-full bg-white rounded-3xl shadow-xl p-6 md:p-10 flex flex-col">
 
-                {/* Progress Header */}
+                {}
                 <div className="mb-8">
                     <div className="flex justify-between items-end mb-2">
                         <span className="text-indigo-600 font-bold text-sm uppercase tracking-widest">Question {currentIndex + 1} sur {quiz.questions.length}</span>
@@ -106,7 +106,7 @@ const QuizPage = () => {
                     </div>
                 </div>
 
-                {/* Question Area */}
+                {}
                 <div className="flex-grow">
                     <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-8 leading-snug">
                         {currentQuestion.question}
@@ -128,7 +128,7 @@ const QuizPage = () => {
                     </div>
                 </div>
 
-                {/* Footer Actions */}
+                {}
                 <div className="mt-10 pt-6 border-t border-gray-100 flex flex-col items-end gap-3">
                     {submitError && (
                         <div className="w-full bg-red-50 border border-red-200 text-red-600 text-sm font-medium px-4 py-3 rounded-xl">

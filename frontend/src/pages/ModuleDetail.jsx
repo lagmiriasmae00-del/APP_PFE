@@ -1,12 +1,16 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import api from '../api/axios';
-// 🌟 استيراد الأيقونات الخطية الاحترافية والجديدة
+
+
 import { BookOpen, HelpCircle, FileText, ArrowRight, GraduationCap, ChevronRight, Loader2 } from 'lucide-react';
 
-// ─────────────────────────────────────────────
-// 📦 Composant : Skeleton Loader (état de chargement)
-// ─────────────────────────────────────────────
+
+
+
+
+
+
 const SkeletonCard = () => (
   <div className="bg-white rounded-2xl border border-gray-100 p-6 animate-pulse space-y-4">
     <div className="flex items-center justify-between">
@@ -22,16 +26,19 @@ const SkeletonCard = () => (
   </div>
 );
 
-// ─────────────────────────────────────────────
-// 📚 Carte 1 : Leçons disponibles
-// ─────────────────────────────────────────────
+
+
+
+
+
+
 const LessonsCard = ({ lessons = [] }) => {
   const navigate = useNavigate();
 
   return (
     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition duration-200 p-6 flex flex-col justify-between min-h-[250px]">
       <div>
-        {/* En-tête de la carte */}
+        {}
         <div className="flex items-center justify-between">
           <div className="p-3 bg-blue-50 text-blue-600 rounded-xl">
             <BookOpen className="w-6 h-6" />
@@ -41,13 +48,13 @@ const LessonsCard = ({ lessons = [] }) => {
           </span>
         </div>
 
-        {/* Contenu */}
+        {}
         <div className="mt-4">
           <h3 className="text-lg font-bold text-gray-950 tracking-tight">Cours</h3>
           <p className="text-gray-400 text-xs mt-1">Leçons disponibles</p>
         </div>
 
-        {/* Liste des leçons */}
+        {}
         {lessons.length > 0 && (
           <ul className="mt-4 space-y-2 max-h-[180px] overflow-y-auto pr-1">
             {lessons.map((lesson, index) => (
@@ -71,7 +78,7 @@ const LessonsCard = ({ lessons = [] }) => {
         )}
       </div>
 
-      {/* État vide ou pied de page */}
+      {}
       {lessons.length === 0 ? (
         <div className="mt-6 pt-4 border-t border-gray-50 text-center text-gray-400 text-xs font-medium">
           Aucune leçon disponible pour le moment.
@@ -111,7 +118,7 @@ const QuizCard = ({ quizzes = [] }) => {
           <p className="text-gray-400 text-xs mt-1">Schéma d'évaluation du module</p>
         </div>
 
-        {/* Infos du quiz actif */}
+        {}
         {mainQuiz && (
           <div className="mt-4 p-3 rounded-xl bg-purple-50/30 border border-purple-100/50 text-center">
             <p className="text-xs font-bold text-purple-950 truncate">{mainQuiz.titre}</p>
@@ -129,7 +136,7 @@ const QuizCard = ({ quizzes = [] }) => {
         )}
       </div>
 
-      {/* État vide */}
+      {}
       {!mainQuiz && (
         <div className="mt-6 pt-4 border-t border-gray-50 text-center text-gray-400 text-xs font-medium">
           Aucun quiz disponible pour le moment.
@@ -139,9 +146,12 @@ const QuizCard = ({ quizzes = [] }) => {
   );
 };
 
-// ─────────────────────────────────────────────
-// 📄 Carte 3 : Documents & EFM
-// ─────────────────────────────────────────────
+
+
+
+
+
+
 const DocumentsCard = ({ documents = [] }) => {
   const [downloading, setDownloading] = useState(null);
 
@@ -167,7 +177,7 @@ const DocumentsCard = ({ documents = [] }) => {
   return (
     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition duration-200 p-6 flex flex-col justify-between min-h-[250px]">
       <div>
-        {/* En-tête */}
+        {}
         <div className="flex items-center justify-between">
           <div className="p-3 bg-emerald-50 text-emerald-600 rounded-xl">
             <FileText className="w-6 h-6" />
@@ -177,13 +187,13 @@ const DocumentsCard = ({ documents = [] }) => {
           </span>
         </div>
 
-        {/* Contenu */}
+        {}
         <div className="mt-4">
           <h3 className="text-lg font-bold text-gray-950 tracking-tight">Supports & EFM</h3>
           <p className="text-gray-400 text-xs mt-1">Documents téléchargeables</p>
         </div>
 
-        {/* Liste des documents */}
+        {}
         {documents.length > 0 && (
           <div className="mt-4 space-y-2 max-h-[180px] overflow-y-auto pr-1">
             {documents.map((doc) => (
@@ -210,7 +220,7 @@ const DocumentsCard = ({ documents = [] }) => {
         )}
       </div>
 
-      {/* État vide */}
+      {}
       {documents.length === 0 && (
         <div className="mt-6 pt-4 border-t border-gray-50 text-center text-gray-400 text-xs font-medium">
           Aucun document disponible pour le moment.
@@ -220,9 +230,12 @@ const DocumentsCard = ({ documents = [] }) => {
   );
 };
 
-// ─────────────────────────────────────────────
-// 🏠 Page Principale : ModuleDetail
-// ─────────────────────────────────────────────
+
+
+
+
+
+
 const ModuleDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -282,14 +295,14 @@ const ModuleDetail = () => {
     <div className="min-h-screen bg-gray-50/50 p-4 md:p-8">
       <div className="max-w-7xl mx-auto space-y-8">
 
-        {/* ── Fil d'Ariane & Navigation ── */}
+        {}
         <nav className="flex items-center space-x-2 text-xs font-semibold text-gray-400">
           <Link to="/modules" className="hover:text-emerald-600 transition">Mes Modules</Link>
           <span>/</span>
           <span className="text-gray-800 truncate max-w-[200px]">{module.titre}</span>
         </nav>
 
-        {/* ── En-tête du Module (Header) ── */}
+        {}
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div className="flex items-center space-x-4">
             <div className="p-4 bg-emerald-50 rounded-2xl text-emerald-600 shadow-inner shrink-0">
@@ -313,7 +326,7 @@ const ModuleDetail = () => {
             </div>
           </div>
 
-          {/* Stats rapides الموحدة لداخل */}
+          {}
           <div className="flex gap-3 bg-gray-50/50 border border-gray-100 p-2 rounded-xl shrink-0 w-full md:w-auto justify-around">
             <div className="text-center px-4 py-1.5">
               <p className="text-lg font-black text-blue-600">{module.lessons?.length || 0}</p>
@@ -332,7 +345,7 @@ const ModuleDetail = () => {
           </div>
         </div>
 
-        {/* ── Grille des 3 Cartes Épurées ── */}
+        {}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
           <LessonsCard lessons={module.lessons || []} />
           <QuizCard quizzes={module.quizzes || []} />

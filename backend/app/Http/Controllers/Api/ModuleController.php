@@ -10,9 +10,7 @@ use Illuminate\Support\Facades\Log;
 
 class ModuleController extends Controller
 {
-    /**
-     * Get modules (Admin sees all, Stagiaire sees only theirs)
-     */
+    
     public function adminIndex(): JsonResponse
     {
         $modules = Module::with(['filiere', 'quizzes', 'lessons'])->get();
@@ -31,16 +29,14 @@ class ModuleController extends Controller
         return response()->json($modules);
     }
 
-    /**
-     * Get a single module with its relations
-     */
+    
     public function show(int $id): JsonResponse
     {
         $user = auth()->user();
         
         $isAdmin = ($user->role === 'admin') || ($user->profile && $user->profile->role === 'admin');
         
-        $module = Module::with(['filiere', 'quizzes', 'lessons.videos', 'documents.files'])->findOrFail($id);
+        $module = Module::with(['filiere', 'quizzes.questions', 'lessons.videos', 'documents.files'])->findOrFail($id);
 
         if (!$isAdmin) {
             $filiere_id = $user->profile ? $user->profile->filiere_id : null;
@@ -54,12 +50,11 @@ class ModuleController extends Controller
         return response()->json($module);
     }
 
-    /**
-     * Create a new module (admin only)
-     */
+    
     public function store(Request $request): JsonResponse
     {
-        // ردينا 'titre' كيقبل القيمة ديال 'nom' إذا جات من الـ Front-end
+        
+
         if ($request->has('nom') && !$request->has('titre')) {
             $request->merge(['titre' => $request->nom]);
         }
@@ -84,9 +79,7 @@ class ModuleController extends Controller
         ], 201);
     }
 
-    /**
-     * Update a module (admin only)
-     */
+    
     public function update(Request $request, int $id): JsonResponse
     {
         $module = Module::findOrFail($id);
@@ -115,9 +108,7 @@ class ModuleController extends Controller
         ]);
     }
 
-    /**
-     * Delete a module (admin only)
-     */
+    
     public function destroy(int $id): JsonResponse
     {
         $module = Module::findOrFail($id);

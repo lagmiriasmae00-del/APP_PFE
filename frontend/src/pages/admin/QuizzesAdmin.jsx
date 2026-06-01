@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import api from '../../api/axios';
-// 🌟 استيراد الأيقونات الاحترافية من مكتبة lucide-react
+
+
 import { Pencil, Trash2, X, Plus, BrainCircuit } from 'lucide-react';
 
 const QuizzesAdmin = () => {
@@ -183,7 +184,7 @@ const QuizzesAdmin = () => {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div>
             <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight flex items-center gap-3">
-              <BrainCircuit className="w-8 h-8 text-indigo-600" /> {/* 🧠 أيقونة احترافية عوض الـ Emoji */}
+              <BrainCircuit className="w-8 h-8 text-indigo-600" /> {}
               Gestion des Quizzes
               <span className="bg-indigo-100 text-indigo-700 text-sm font-bold px-3 py-1 rounded-full">{quizzes.length}</span>
             </h1>
@@ -222,7 +223,7 @@ const QuizzesAdmin = () => {
                       )}
                     </td>
                     <td className="px-6 py-4">
-                      {/* 🌟 هنا التغيير الكبير: أزرار احترافية بـ Lucide Icons و Hover نظيف */}
+                      {}
                       <div className="flex gap-2">
                         <button 
                           onClick={() => openEditModal(quiz)} 

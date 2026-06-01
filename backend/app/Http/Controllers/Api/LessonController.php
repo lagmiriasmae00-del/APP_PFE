@@ -38,7 +38,8 @@ class LessonController extends Controller
     {
         $lesson = Lesson::with(['module', 'videos'])->findOrFail($id);
         
-        // Security checks can be added here if needed
+        
+
         
         return response()->json($lesson);
     }
@@ -125,9 +126,11 @@ class LessonController extends Controller
             $lesson->update($request->only(['titre', 'module_id', 'contenu']));
 
             if ($request->has('videos')) {
-                // Delete old videos
+                
+
                 $lesson->videos()->delete();
-                // Create new videos
+                
+
                 foreach ($request->videos as $video) {
                     LessonVideo::create([
                         'video_url' => $video['video_url'],

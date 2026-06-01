@@ -1,45 +1,45 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { loginSuccess } from '../features/authSlice';
-import api from '../api/axios'; // تأكد من مسار ملف axios
+import api from '../api/axios'; 
 import { useNavigate, Link } from 'react-router-dom';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false); // حالة التحميل باش نوقفو لـ بوتون وقت الإرسال
+  const [loading, setLoading] = useState(false); 
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setLoading(true); // كيبدا التحميل
+    setLoading(true); 
     
     try {
       const res = await api.post('/login', { email, password });
       dispatch(loginSuccess(res.data));
       if (res.data.user?.profile?.role === 'admin') {
-        navigate('/admin'); // التوجيه للوحة التحكم للمدير
+        navigate('/admin'); 
       } else {
-        navigate('/dashboard'); // التوجيه للـ Dashboard للطالب
+        navigate('/dashboard'); 
       }
     } catch (err) {
       console.error("Erreur de login complète:", err);
       
-      // 1. إذا كان السيرفر طافي تماماً أو الـ URL غلط (Network Error)
+      
       if (!err.response) {
         alert("🚨 مشكل ف الاتصال بالـ Backend! واش السيرفر ديال Laravel شغال ومفتوح؟ تأكدي من تشغيل 'php artisan serve'");
       } 
-      // 2. إذا كان السيرفر شغال والمعطيات غلاط (422 أو 401)
+      
       else if (err.response.status === 422 || err.response.status === 401) {
         alert("❌ Email ou mot de passe incorrect.");
       } 
-      // 3. أي إيرور آخر ديال السيرفر (بحال 500)
+      
       else {
         alert(`حدث خطأ ف السيرفر: ${err.response.data.message || "Erreur serveur"}`);
       }
     } finally {
-      setLoading(false); // كيسالي التحميل ف كاع الحالات
+      setLoading(false); 
     }
   };
 

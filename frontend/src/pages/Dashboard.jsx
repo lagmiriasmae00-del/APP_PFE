@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import api from '../api/axios';
 import { useSelector } from 'react-redux';
 import { Link, Navigate } from 'react-router-dom';
-// 🌟 استيراد الأيقونات الخطية النقية المتناسقة مع الـ Header
+
 import { BookOpen, CheckCircle, FileText, Loader2, ArrowRight } from 'lucide-react';
 
 const Dashboard = () => {
@@ -19,7 +19,7 @@ const Dashboard = () => {
     return <Navigate to="/admin" replace />;
   }
 
-  // 🔄 الـ Loading الموحد والنقي
+  
   if (!stats) return (
     <div className="min-h-screen bg-gray-50/50 flex items-center justify-center">
       <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
@@ -29,7 +29,7 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-gray-50/50 p-4 md:p-8">
       
-      {/* Header Section */}
+      {}
       <div className="max-w-7xl mx-auto mb-10">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
@@ -41,10 +41,10 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Stats Grid */}
+      {}
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
         
-        {/* Card 1: Modules */}
+        {}
         <div className="relative overflow-hidden bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-all group">
           <div className="absolute top-0 right-0 w-20 h-20 bg-blue-50 rounded-bl-full -mr-6 -mt-6 transition-all group-hover:bg-blue-100/70"></div>
           <div className="relative space-y-4">
@@ -65,7 +65,7 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Card 2: Quizzes */}
+        {}
         <div className="relative overflow-hidden bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-all group">
           <div className="absolute top-0 right-0 w-20 h-20 bg-emerald-50 rounded-bl-full -mr-6 -mt-6 transition-all group-hover:bg-emerald-100/70"></div>
           <div className="relative space-y-4">
@@ -86,7 +86,7 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Card 3: Documents */}
+        {}
         <div className="relative overflow-hidden bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-all group">
           <div className="absolute top-0 right-0 w-20 h-20 bg-amber-50 rounded-bl-full -mr-6 -mt-6 transition-all group-hover:bg-amber-100/70"></div>
           <div className="relative space-y-4">
@@ -98,10 +98,10 @@ const Dashboard = () => {
               <p className="text-3xl font-black text-gray-900 mt-1">{stats.exams_total}</p>
             </div>
             <Link 
-              to="/documents" 
+              to="/modules" 
               className="inline-flex items-center gap-1 text-xs text-amber-600 font-bold hover:gap-2 transition-all cursor-pointer pt-2"
             >
-              <span>Télécharger les supports</span>
+              <span>Ouvrir les documents</span>
               <ArrowRight className="w-3 h-3" />
             </Link>
           </div>

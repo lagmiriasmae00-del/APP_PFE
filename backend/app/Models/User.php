@@ -26,7 +26,8 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
-    // Relations
+    
+
     public function profile()
     {
         return $this->hasOne(UserProfile::class);
@@ -42,7 +43,8 @@ class User extends Authenticatable
         return $this->hasMany(Result::class);
     }
 
-    // Accessor for niveau (get from profile)
+    
+
     public function getNiveauAttribute()
     {
         return $this->profile?->niveau;

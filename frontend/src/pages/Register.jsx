@@ -72,7 +72,7 @@ const Register = () => {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-50/50 p-4">
-      {/* الـ Card دابا ملموم ومجموع بلا Scroll داخلي */}
+      {}
       <div className="bg-white p-6 md:p-8 rounded-3xl shadow-xl border border-gray-100 w-full max-w-xl">
         
         <div className="text-center mb-6">
@@ -123,7 +123,7 @@ const Register = () => {
             </div>
           </div>
 
-          {/* 🌟 السطر 3: Password & Confirmation فـ نفس السطر */}
+          {}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Mot de passe</label>
@@ -145,7 +145,7 @@ const Register = () => {
             </div>
           </div>
           
-          {/* 🌟 السطر 4: Filière & Niveau فـ نفس السطر */}
+          {}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Filière</label>

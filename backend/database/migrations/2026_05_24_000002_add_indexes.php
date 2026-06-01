@@ -6,12 +6,11 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
+    
     public function up(): void
     {
-        // Composite index for modules queries
+        
+
         if (Schema::hasTable('modules')) {
             Schema::table('modules', function (Blueprint $table) {
                 if (!Schema::hasIndex('modules', 'modules_filiere_id_niveau_index')) {
@@ -20,7 +19,8 @@ return new class extends Migration
             });
         }
 
-        // Index for results queries
+        
+
         if (Schema::hasTable('results')) {
             Schema::table('results', function (Blueprint $table) {
                 if (!Schema::hasIndex('results', 'results_user_id_date_passe_index')) {
@@ -29,7 +29,8 @@ return new class extends Migration
             });
         }
 
-        // Index for user responses
+        
+
         if (Schema::hasTable('user_reponses')) {
             Schema::table('user_reponses', function (Blueprint $table) {
                 if (!Schema::hasIndex('user_reponses', 'user_reponses_user_id_question_id_index')) {
@@ -38,7 +39,8 @@ return new class extends Migration
             });
         }
 
-        // Index for documents
+        
+
         if (Schema::hasTable('documents')) {
             Schema::table('documents', function (Blueprint $table) {
                 if (!Schema::hasIndex('documents', 'documents_module_id_type_index')) {
@@ -48,9 +50,7 @@ return new class extends Migration
         }
     }
 
-    /**
-     * Reverse the migrations.
-     */
+    
     public function down(): void
     {
         if (Schema::hasTable('modules')) {

@@ -30,14 +30,16 @@ class AuthController extends Controller
         ]);
 
         try {
-            // Create user
+            
+
             $user = User::create([
                 'name' => $validated['name'],
                 'email' => $validated['email'],
                 'password' => Hash::make($validated['password']),
             ]);
 
-            // Create user profile
+            
+
             $user->profile()->create([
                 'nom' => $validated['nom'],
                 'prenom' => $validated['prenom'],
@@ -46,7 +48,8 @@ class AuthController extends Controller
                 'filiere_id' => $validated['filiere_id'],
             ]);
 
-            // Generate token
+            
+
             $token = $user->createToken('auth_token')->plainTextToken;
 
             Log::info('User registered', [
@@ -79,10 +82,12 @@ class AuthController extends Controller
             'password' => 'required|string'
         ]);
 
-        // 1. كنقلبو على الـ User بالإيميل أولاً
+        
+
         $user = User::where('email', $validated['email'])->first();
 
-        // 2. مقارنة الـ password بشكل يدوي ومضمون للأدمين وباقي المستخدمين
+        
+
         if (!$user || !Hash::check($validated['password'], $user->password)) {
             Log::warning('Failed login attempt', [
                 'email' => $validated['email'],
@@ -94,7 +99,8 @@ class AuthController extends Controller
             ]);
         }
 
-        // 3. مسح الـ tokens القدام وكري واحد جديد
+        
+
         $user->tokens()->delete();
         $token = $user->createToken('auth_token')->plainTextToken;
 
@@ -129,22 +135,16 @@ class AuthController extends Controller
     public function getStats(): JsonResponse
     {
         $user = auth()->user()->load('profile');
-        $cacheKey = "user_{$user->id}_stats";
-        $ttl = config('quiz.stats_cache_ttl', 3600);
 
-        $stats = Cache::remember($cacheKey, $ttl, function () use ($user) {
-            // إذا كان المستخدم أدمين، كنعطيوه إحصائيات الموقع كامل بلا فِلتر ✨
-            if ($user->profile && $user->profile->role === 'admin') {
-                return [
-                    'modules_total'     => Module::count(),
-                    'quizzes_completed' => Result::count(), 
-                    'exams_total'       => Document::count(),
-                    'user_name'         => $user->profile->nom . ' ' . $user->profile->prenom
-                ];
-            }
-
-            // إذا كان stagiaire، كتبقى الفلترة العادية ديالو على حساب الـ filière والـ niveau
-            return [
+        if ($user->profile && $user->profile->role === 'admin') {
+            $stats = [
+                'modules_total'     => Module::count(),
+                'quizzes_completed' => Result::count(), 
+                'exams_total'       => Document::count(),
+                'user_name'         => $user->profile->nom . ' ' . $user->profile->prenom
+            ];
+        } else {
+            $stats = [
                 'modules_total' => Module::where('filiere_id', $user->profile->filiere_id)
                     ->where('niveau', $user->profile->niveau)
                     ->count(),
@@ -155,7 +155,7 @@ class AuthController extends Controller
                 })->count(),
                 'user_name' => $user->profile->nom . ' ' . $user->profile->prenom
             ];
-        });
+        }
 
         return response()->json($stats);
     }
@@ -170,7 +170,8 @@ class AuthController extends Controller
     {
         $user = User::findOrFail($id);
 
-        // Verify authorization (باش الـ Admin ما يمسحش راسو بالغلط)
+        
+
         if (auth()->id() === $id) {
             return response()->json([
                 'error' => 'Cannot delete your own account'

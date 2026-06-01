@@ -16,14 +16,11 @@ use App\Models\User;
 
 class TestDataSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     *
-     * @return void
-     */
+    
     public function run()
     {
-        // 1. كريينا لادامين إلا ماكانش
+        
+
         $admin = User::firstOrCreate(
             ['email' => 'admin@smartlearn.com'],
             [
@@ -32,12 +29,14 @@ class TestDataSeeder extends Seeder
             ]
         );
 
-        // 2. كريينا الشعبة
+        
+
         $filiere = Filiere::firstOrCreate(
             ['nom' => 'Développement Digital - Option Web Full Stack']
         );
 
-        // 3. الداتا ديال الموديلات والدروس
+        
+
         $modulesData = [
             [
                 'titre' => 'Développement Back-end avec Laravel',
@@ -69,7 +68,8 @@ class TestDataSeeder extends Seeder
         ];
 
         foreach ($modulesData as $data) {
-            // كـريينا الـ Module
+            
+
             $module = Module::create([
                 'titre' => $data['titre'],
                 'niveau' => $data['niveau'],
@@ -77,7 +77,8 @@ class TestDataSeeder extends Seeder
                 'filiere_id' => $filiere->id
             ]);
 
-            // كريينا الدروس والفيديوهات
+            
+
             foreach ($data['lessons'] as $index => $lessonData) {
                 $lesson = Lesson::create([
                     'titre' => $lessonData['titre'],
@@ -94,26 +95,30 @@ class TestDataSeeder extends Seeder
                 ]);
             }
 
-            // 🌟 كريينا الكويز العام للموديل
+            
+
             $quiz = Quizze::create([
                 'titre' => 'Quiz d\'évaluation : ' . $module->titre,
                 'module_id' => $module->id
             ]);
 
-            // 🌟 تعمار الأسئلة بالطريقة الصحيحة باستعمال العلاقة (أوتوماتيكياً كتاخد quizze_id)
+            
+
             for ($i = 1; $i <= 3; $i++) {
                 $question = $quiz->questions()->create([
                     'question' => 'Question test numéro ' . $i . ' sur ' . $module->titre . ' ?',
                     'point' => 2,
                 ]);
 
-                // كريينا الاختيارات الـ 3 (Choice)
+                
+
                 Choice::create(['text_choix' => 'Une réponse incorrecte', 'est_correcte' => false, 'question_id' => $question->id]);
                 Choice::create(['text_choix' => 'La bonne réponse !', 'est_correcte' => true, 'question_id' => $question->id]);
                 Choice::create(['text_choix' => 'Une autre réponse fausse', 'est_correcte' => false, 'question_id' => $question->id]);
             }
 
-            // كريينا الملفات والـ EFM
+            
+
             $document = Document::create([
                 'titre' => 'Support de cours et Exercices',
                 'type' => 'efm',

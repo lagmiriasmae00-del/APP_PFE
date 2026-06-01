@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 const About = () => {
   return (
     <div className="bg-white">
-      {/* 1. Header Section - عنوان الصفحة */}
+      {}
       <section className="bg-blue-600 py-20 text-white">
         <div className="container mx-auto px-6 text-center">
           <h1 className="text-4xl md:text-5xl font-extrabold mb-4">À propos d'EduLink</h1>

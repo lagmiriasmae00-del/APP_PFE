@@ -6,19 +6,19 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
+    
     public function up(): void
     {
-        // Add niveau to user_profiles if missing
+        
+
         if (Schema::hasTable('user_profiles') && !Schema::hasColumn('user_profiles', 'niveau')) {
             Schema::table('user_profiles', function (Blueprint $table) {
                 $table->integer('niveau')->nullable()->after('prenom');
             });
         }
 
-        // Copy niveau from users to user_profiles
+        
+
         if (Schema::hasTable('users') && Schema::hasColumn('users', 'niveau') &&
             Schema::hasTable('user_profiles') && Schema::hasColumn('user_profiles', 'niveau')) {
             \DB::statement('
@@ -29,7 +29,8 @@ return new class extends Migration
             ');
         }
 
-        // Remove niveau from users table
+        
+
         if (Schema::hasTable('users') && Schema::hasColumn('users', 'niveau')) {
             Schema::table('users', function (Blueprint $table) {
                 $table->dropColumn('niveau');
@@ -37,9 +38,7 @@ return new class extends Migration
         }
     }
 
-    /**
-     * Reverse the migrations.
-     */
+    
     public function down(): void
     {
         if (Schema::hasTable('users')) {

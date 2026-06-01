@@ -1,10 +1,12 @@
-/* eslint-disable */
+
 import React, { useEffect, useState } from 'react';
 import api from '../../api/axios';
 
-// صفحة الأدمين ديال إدارة الفيليار (Filières)
+
+
 const FilieresAdmin = () => {
-  // الحالات ديال الكومبونون
+  
+
   const [filieres, setFilieres] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -15,12 +17,14 @@ const FilieresAdmin = () => {
   const [deletingId, setDeletingId] = useState(null);
   const [submitting, setSubmitting] = useState(false);
 
-  // فونكسيون باش نجيبو الفيليار كاملين
+  
+
   const fetchFilieres = async () => {
     try {
       setLoading(true);
       const res = await api.get('/admin/filieres');
-      // protect against non-array response
+      
+
       setFilieres(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
       console.error(err);
@@ -31,12 +35,14 @@ const FilieresAdmin = () => {
     }
   };
 
-  // كنجيبو الفيليار من الـ API فاش كيتحمل الكومبونون
+  
+
   useEffect(() => {
     fetchFilieres();
   }, []);
 
-  // كنخبيو الرسالة أوتوماتيكياً بعد 3 ثواني
+  
+
   useEffect(() => {
     if (message.text) {
       const timer = setTimeout(() => setMessage({ text: '', type: '' }), 3000);
@@ -44,7 +50,8 @@ const FilieresAdmin = () => {
     }
   }, [message]);
 
-  // فونكسيون ديال الإضافة أو التعديل
+  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!nom.trim()) return;
@@ -52,15 +59,18 @@ const FilieresAdmin = () => {
     try {
       setSubmitting(true);
       if (editingFiliere) {
-        // تعديل فيليار موجودة
+        
+
         await api.put(`/admin/filieres/${editingFiliere.id}`, { nom });
         setMessage({ text: 'Filière modifiée avec succès !', type: 'success' });
       } else {
-        // إضافة فيليار جديدة
+        
+
         await api.post('/admin/filieres', { nom });
         setMessage({ text: 'Filière ajoutée avec succès !', type: 'success' });
       }
-      // نعاودو نجيبو الليستة ونسدو المودال
+      
+
       await fetchFilieres();
       closeModal();
     } catch (err) {
@@ -72,7 +82,8 @@ const FilieresAdmin = () => {
     }
   };
 
-  // فونكسيون ديال الحذف
+  
+
   const handleDelete = async () => {
     if (!deletingId) return;
 
@@ -91,34 +102,39 @@ const FilieresAdmin = () => {
     }
   };
 
-  // كنفتحو المودال للإضافة
+  
+
   const openAddModal = () => {
     setEditingFiliere(null);
     setNom('');
     setShowModal(true);
   };
 
-  // كنفتحو المودال للتعديل
+  
+
   const openEditModal = (filiere) => {
     setEditingFiliere(filiere);
     setNom(filiere.nom);
     setShowModal(true);
   };
 
-  // كنسدو المودال
+  
+
   const closeModal = () => {
     setShowModal(false);
     setEditingFiliere(null);
     setNom('');
   };
 
-  // كنأكدو الحذف
+  
+
   const confirmDelete = (id) => {
     setDeletingId(id);
     setShowDeleteConfirm(true);
   };
 
-  // سبينر ديال التحميل
+  
+
   if (loading) {
     return (
       <div className="flex flex-col justify-center items-center min-h-screen bg-gray-50 gap-4">
@@ -132,7 +148,7 @@ const FilieresAdmin = () => {
     <div className="min-h-screen bg-gray-50/50 p-4 md:p-8">
       <div className="max-w-5xl mx-auto">
 
-        {/* ==================== رسالة النجاح أو الخطأ ==================== */}
+        {}
         {message.text && (
           <div
             className={`mb-6 px-5 py-3 rounded-xl text-sm font-medium shadow-sm flex items-center gap-2 transition-all duration-300 ${
@@ -146,7 +162,7 @@ const FilieresAdmin = () => {
           </div>
         )}
 
-        {/* ==================== الهيدر ==================== */}
+        {}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div className="flex items-center gap-3">
             <div className="p-3 bg-indigo-50 text-indigo-600 rounded-xl">
@@ -173,10 +189,11 @@ const FilieresAdmin = () => {
           </button>
         </div>
 
-        {/* ==================== الجدول ==================== */}
+        {}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
           {filieres.length === 0 ? (
-            // حالة فارغة - ما كاين حتى فيليار
+            
+
             <div className="flex flex-col items-center justify-center py-20 px-4">
               <div className="text-6xl mb-4">📂</div>
               <h3 className="text-lg font-bold text-gray-700 mb-1">
@@ -248,18 +265,18 @@ const FilieresAdmin = () => {
           )}
         </div>
 
-        {/* ==================== المودال ديال الإضافة / التعديل ==================== */}
+        {}
         {showModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            {/* الخلفية المعتمة */}
+            {}
             <div
               className="absolute inset-0 bg-black/40 backdrop-blur-sm"
               onClick={closeModal}
             ></div>
 
-            {/* محتوى المودال */}
+            {}
             <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 transform transition-all">
-              {/* عنوان المودال */}
+              {}
               <div className="flex items-center gap-3 mb-6">
                 <div className={`p-2.5 rounded-xl ${editingFiliere ? 'bg-blue-50 text-blue-600' : 'bg-indigo-50 text-indigo-600'}`}>
                   {editingFiliere ? '✏️' : '➕'}
@@ -269,7 +286,7 @@ const FilieresAdmin = () => {
                 </h2>
               </div>
 
-              {/* الفورم */}
+              {}
               <form onSubmit={handleSubmit}>
                 <div className="mb-6">
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -286,7 +303,7 @@ const FilieresAdmin = () => {
                   />
                 </div>
 
-                {/* أزرار المودال */}
+                {}
                 <div className="flex items-center justify-end gap-3">
                   <button
                     type="button"
@@ -311,10 +328,10 @@ const FilieresAdmin = () => {
           </div>
         )}
 
-        {/* ==================== المودال ديال تأكيد الحذف ==================== */}
+        {}
         {showDeleteConfirm && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            {/* الخلفية المعتمة */}
+            {}
             <div
               className="absolute inset-0 bg-black/40 backdrop-blur-sm"
               onClick={() => {
@@ -323,7 +340,7 @@ const FilieresAdmin = () => {
               }}
             ></div>
 
-            {/* محتوى مودال الحذف */}
+            {}
             <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 transform transition-all">
               <div className="flex flex-col items-center text-center">
                 <div className="p-3 bg-red-50 rounded-full mb-4">

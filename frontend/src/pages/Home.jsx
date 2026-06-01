@@ -4,10 +4,10 @@ import { Link } from 'react-router-dom';
 const Home = () => {
   return (
     <div className="bg-white">
-      {/* 1. HERO SECTION - الجزء العلوي */}
+      {}
       <section className="container mx-auto px-6 py-12 md:py-20 flex flex-col md:flex-row items-center gap-12">
         
-        {/* النص - Left Side */}
+        {}
         <div className="md:w-1/2 space-y-6 text-center md:text-left">
           <h1 className="text-5xl md:text-6xl font-extrabold text-gray-900 leading-tight">
             L'avenir de <br />

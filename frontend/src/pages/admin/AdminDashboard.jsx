@@ -1,25 +1,30 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import api from '../../api/axios';
-// استيراد الأيقونات العصرية والنقية 🖤
+
+
 import { GraduationCap, BookOpen, FileText, AlertTriangle, RefreshCw, BarChart3, ShieldCheck } from 'lucide-react';
 
-// هاد الصفحة هي الـ Dashboard ديال الأدمين
-// كتعرض الإحصائيات ديال الفيليارات والموديلات والامتحانات
+
+
+
+
 const AdminDashboard = () => {
   const { user } = useSelector((state) => state.auth);
   const [stats, setStats] = useState({ filieres: 0, modules: 0, quizzes: 0 });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // كنجيبو الداتا من 3 endpoints فاش كيتحمل الكومبوننت
+  
+
   useEffect(() => {
     const fetchStats = async () => {
       try {
         setLoading(true);
         setError(null);
 
-        // كنطلقو 3 requêtes بالتوازي باش يكون أسرع
+        
+
         const [filieresRes, modulesRes, quizzesRes] = await Promise.all([
           api.get('/admin/filieres'),
           api.get('/admin/modules'),
@@ -42,7 +47,8 @@ const AdminDashboard = () => {
     fetchStats();
   }, []);
 
-  // سبينر ديال التحميل (معدل بـ Style نقي)
+  
+
   if (loading) {
     return (
       <div className="flex flex-col justify-center items-center h-[60vh] gap-4">
@@ -52,7 +58,8 @@ const AdminDashboard = () => {
     );
   }
 
-  // رسالة الخطأ (معدلة بـ الأيقونة العصرية)
+  
+
   if (error) {
     return (
       <div className="flex flex-col justify-center items-center h-[60vh] gap-4">
@@ -73,7 +80,8 @@ const AdminDashboard = () => {
     );
   }
 
-  // الكروت ديال الإحصائيات مع الأيقونات الجداد الكحلين 🖤
+  
+
   const statCards = [
     {
       label: 'Total Filières',
@@ -107,7 +115,7 @@ const AdminDashboard = () => {
   return (
     <div className="max-w-7xl mx-auto p-4 md:p-6">
 
-      {/* === قسم الترحيب === */}
+      {}
       <div className="mb-10">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
@@ -121,7 +129,7 @@ const AdminDashboard = () => {
         </div>
       </div>
 
-      {/* === الكروت ديال الإحصائيات === */}
+      {}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-10">
         {statCards.map((card, index) => (
           <div
@@ -129,11 +137,11 @@ const AdminDashboard = () => {
             className="relative overflow-hidden bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300 group"
             style={{ animationDelay: `${index * 100}ms` }}
           >
-            {/* دائرة ديكوراتيف فالكوان */}
+            {}
             <div className={`absolute top-0 right-0 w-24 h-24 ${card.bgLight} rounded-bl-full -mr-10 -mt-10 transition-all ${card.hoverBg}`}></div>
             
             <div className="relative">
-              {/* الأيقونة العصرية بلون أسود داخل خلفية خفيفة */}
+              {}
               <div className={`p-3 ${card.bgLight} text-black rounded-xl w-fit mb-4`}>
                 {card.icon}
               </div>
@@ -151,7 +159,7 @@ const AdminDashboard = () => {
         ))}
       </div>
 
-      {/* === بانر معلوماتي فالأسفل مع الـ الأيقونات النقيين === */}
+      {}
       <div className="bg-gradient-to-r from-indigo-600 to-violet-700 p-8 rounded-3xl shadow-xl text-white relative overflow-hidden">
         <div className="relative z-10">
           <h2 className="text-xl font-bold mb-2" style={{ fontFamily: 'Outfit, sans-serif' }}>
@@ -171,7 +179,7 @@ const AdminDashboard = () => {
             </span>
           </div>
         </div>
-        {/* دوائر ديكوراتيف */}
+        {}
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-32 -mt-32"></div>
         <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/5 rounded-full -ml-16 -mb-16"></div>
       </div>

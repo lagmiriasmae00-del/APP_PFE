@@ -38,7 +38,8 @@ class QuizController extends Controller
     {
         $quiz = Quizze::with(['module', 'questions.choices'])->findOrFail($id);
         
-        // Security checks can be added here if needed
+        
+
         
         return response()->json($quiz);
     }
@@ -47,23 +48,27 @@ class QuizController extends Controller
     {
         $user = auth()->user();
         
-        // Validate input
+        
+
         $validated = $request->validate([
             'answers' => 'required|array',
             'answers.*' => 'required|integer|exists:choices,id'
         ]);
 
         try {
-            // Use transaction for data integrity
+            
+
             return DB::transaction(function () use ($user, $quizId, $validated) {
                 $totalQuestions = 0;
                 $correctAnswersCount = 0;
 
-                // Fetch quiz with relations
+                
+
                 $quiz = Quizze::with('questions.choices', 'module')
                     ->findOrFail($quizId);
 
-                // Verify user has access to this quiz
+                
+
                 if ($quiz->module->filiere_id !== $user->profile->filiere_id ||
                     $quiz->module->niveau !== $user->profile->niveau) {
                     Log::warning('Unauthorized quiz access attempt', [
@@ -73,42 +78,49 @@ class QuizController extends Controller
                     return response()->json(['error' => 'Access denied'], 403);
                 }
 
-                // Delete old answers if retaking quiz
+                
+
                 UserReponse::where('user_id', $user->id)
                            ->whereIn('question_id', $quiz->questions->pluck('id'))
                            ->delete();
 
-                // Process each question
+                
+
                 foreach ($quiz->questions as $question) {
                     $totalQuestions++;
                     $submittedChoiceId = $validated['answers'][$question->id] ?? null;
 
                     if ($submittedChoiceId) {
-                        // Verify choice belongs to this question
+                        
+
                         $choice = Choice::where('id', $submittedChoiceId)
                                        ->where('question_id', $question->id)
                                        ->firstOrFail();
 
-                        // Record answer
+                        
+
                         UserReponse::create([
                             'user_id' => $user->id,
                             'question_id' => $question->id,
                             'choice_id' => $submittedChoiceId
                         ]);
 
-                        // Check if correct
+                        
+
                         if ($choice->est_correcte) {
                             $correctAnswersCount++;
                         }
                     }
                 }
 
-                // Calculate score
+                
+
                 $passingScore = config('quiz.passing_score', 50);
                 $score = ($totalQuestions > 0) ? ($correctAnswersCount / $totalQuestions) * 100 : 0;
                 $passed = $score >= $passingScore;
 
-                // Record result
+                
+
                 $result = Result::updateOrCreate(
                     ['user_id' => $user->id, 'quiz_id' => $quizId],
                     [
@@ -127,7 +139,8 @@ class QuizController extends Controller
                     'ip' => request()->ip()
                 ]);
 
-                // 🧹 مسح الكاش ديال الإحصائيات باش يبان في الـ Dashboard بلي كمل الكويز
+                
+
                 \Illuminate\Support\Facades\Cache::forget("user_{$user->id}_stats");
 
                 return response()->json([
@@ -230,13 +243,15 @@ class QuizController extends Controller
             ]);
 
             if (isset($validated['questions'])) {
-                // Delete old questions (which will cascade delete choices if DB is set up, but we'll do it manually just in case)
+                
+
                 foreach ($quiz->questions as $question) {
                     $question->choices()->delete();
                     $question->delete();
                 }
 
-                // Insert new questions
+                
+
                 foreach ($validated['questions'] as $qData) {
                     $question = $quiz->questions()->create([
                         'question' => $qData['question'],
