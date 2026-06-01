@@ -8,7 +8,7 @@ import { GraduationCap, BookOpen, FileText, AlertTriangle, RefreshCw, BarChart3,
 // كتعرض الإحصائيات ديال الفيليارات والموديلات والامتحانات
 const AdminDashboard = () => {
   const { user } = useSelector((state) => state.auth);
-  const [stats, setStats] = useState({ filieres: 0, modules: 0, examens: 0 });
+  const [stats, setStats] = useState({ filieres: 0, modules: 0, quizzes: 0 });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -29,7 +29,7 @@ const AdminDashboard = () => {
         setStats({
           filieres: Array.isArray(filieresRes.data) ? filieresRes.data.length : 0,
           modules: Array.isArray(modulesRes.data) ? modulesRes.data.length : 0,
-          examens: Array.isArray(quizzesRes.data) ? quizzesRes.data.length : 0,
+          quizzes: Array.isArray(quizzesRes.data) ? quizzesRes.data.length : 0,
         });
       } catch (err) {
         console.error('Erreur lors du chargement des statistiques:', err);
@@ -94,13 +94,13 @@ const AdminDashboard = () => {
       description: 'Modules disponibles',
     },
     {
-      label: 'Total Examens',
-      count: stats.examens,
+      label: 'Total Quizzes',
+      count: stats.quizzes,
       icon: <FileText className="w-6 h-6" />,
       bgLight: 'bg-orange-50',
       textColor: 'text-orange-600',
       hoverBg: 'group-hover:bg-orange-100',
-      description: 'Examens publiés',
+      description: 'Quizzes publiés',
     },
   ];
 
@@ -112,17 +112,11 @@ const AdminDashboard = () => {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight" style={{ fontFamily: 'Outfit, sans-serif' }}>
-              Bienvenue, <span className="text-indigo-600">{user?.name || 'Admin EduLink'}</span> 👋
+              Bienvenue, <span className="text-indigo-600">{user?.name || 'Admin EduLink'}</span>
             </h1>
             <p className="text-gray-500 mt-1">
               Voici un aperçu global de votre plateforme EduLink.
             </p>
-          </div>
-          
-          {/* Statut Système */}
-          <div className="flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-200 rounded-full shadow-sm self-start md:self-center">
-            <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-            <span className="text-xs font-normal text-gray-600">Statut: Système Actif</span>
           </div>
         </div>
       </div>
@@ -164,7 +158,7 @@ const AdminDashboard = () => {
             Gestion de la Plateforme
           </h2>
           <p className="opacity-90 text-sm leading-relaxed max-w-2xl font-normal">
-            Vous gerez actuellement <span className="font-semibold">{stats.filieres} filières</span>, <span className="font-semibold">{stats.modules} modules</span> et <span className="font-semibold">{stats.examens} examens</span>.
+            Vous gerez actuellement <span className="font-semibold">{stats.filieres} filières</span>, <span className="font-semibold">{stats.modules} modules</span> et <span className="font-semibold">{stats.quizzes} quizzes</span>.
             Utilisez le menu latéral pour accéder à chaque section.
           </p>
           

@@ -12,15 +12,20 @@ class Document extends Model
     protected $fillable = [
         'titre',
         'type',
-        'file_url',
-        'file_size',
-        'module_id',
-        'uploaded_by'
+        'niveau',
+        'annee',
+        'filiere_id',
+        'module_id'
     ];
 
     public function module()
     {
         return $this->belongsTo(Module::class);
+    }
+
+    public function filiere()
+    {
+        return $this->belongsTo(Filiere::class);
     }
 
     public function uploader()

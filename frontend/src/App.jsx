@@ -1,35 +1,36 @@
 import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
-// Components
+// المكونات الأساسية
 import Header from './components/Header';
 import Footer from './components/Footer';
 
-// Pages - Public & Student
-import Home from './pages/Home';           
-import About from './pages/About';         
+// الصفحات
+import Home from './pages/Home';
+import About from './pages/About';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import ModulesList from './pages/ModulesList';
 import ModuleDetail from './pages/ModuleDetail';
+import LessonPage from './pages/LessonPage';
+import QuizPage from './pages/QuizPage';
 import Profile from './pages/Profile';
 
-// Pages - Admin
+// صفحات الإدارة
 import AdminDashboard from './pages/admin/AdminDashboard';
 import ModulesAdmin from './pages/admin/ModulesAdmin';
-import ExamensAdmin from './pages/admin/ExamensAdmin';
 import QuizzesAdmin from './pages/admin/QuizzesAdmin';
 import DocumentsAdmin from './pages/admin/DocumentsAdmin';
 import FilieresAdmin from './pages/admin/FilieresAdmin';
 import UsersAdmin from './pages/admin/UsersAdmin';
 import LessonsAdmin from './pages/admin/LessonsAdmin';
 
-// القالب الموحد والوحيد للمنصة (بدون Sidebar جانبية) ✨
+// القالب الموحد (Layout) الذي يحل مشكلة الـ Footer
 const PublicLayout = () => (
-  <div className="flex flex-col min-h-screen">
+  <div className="flex flex-col min-h-screen bg-gray-50/50">
     <Header />
-    <main className="flex-grow">
+    <main className="flex-grow w-full">
       <Outlet />
     </main>
     <Footer />
@@ -37,60 +38,49 @@ const PublicLayout = () => (
 );
 
 function App() {
-  const { isAuthenticated } = useSelector((state) => state.auth);
+  const { isAuthenticated, user } = useSelector((state) => state.auth);
+  const role = user?.profile?.role;
 
   return (
     <Router>
       <Routes>
-        
-        {/* كاع الروابط (العامة، الطلبة، والأدمين) مجموعين تحت نفس الـ Layout النقي */}
+        {/* الربط مع القالب الموحد */}
         <Route path="/" element={<PublicLayout />}>
           
-          {/* === الروابط العامة === */}
+          {/* الصفحات العامة */}
           <Route index element={<Home />} />
           <Route path="about" element={<About />} />
 
+          {/* التوجيه عند الدخول */}
           <Route 
-  path="login" 
-  element={!isAuthenticated ? <Login /> : <Navigate to="/dashboard" />} 
-/>
+            path="login" 
+            element={!isAuthenticated ? <Login /> : <Navigate to={role === 'admin' ? "/admin" : "/dashboard"} replace />} 
+          />
           <Route 
             path="register" 
-            element={!isAuthenticated ? <Register /> : <Navigate to="/dashboard" />} 
+            element={!isAuthenticated ? <Register /> : <Navigate to={role === 'admin' ? "/admin" : "/dashboard"} replace />} 
           />
 
-          {/* === روابط الـ Stagiaire المحمية === */}
-          <Route 
-            path="dashboard" 
-            element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />} 
-          />
-          <Route 
-            path="modules" 
-            element={isAuthenticated ? <ModulesList /> : <Navigate to="/login" />} 
-          />
-          <Route 
-            path="module/:id" 
-            element={isAuthenticated ? <ModuleDetail /> : <Navigate to="/login" />} 
-          />
-          <Route 
-            path="profile" 
-            element={isAuthenticated ? <Profile /> : <Navigate to="/login" />} 
-          />
+          {/* روابط الطالب المحمية */}
+          <Route path="dashboard" element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" replace />} />
+          <Route path="modules" element={isAuthenticated ? <ModulesList /> : <Navigate to="/login" replace />} />
+          <Route path="module/:id" element={isAuthenticated ? <ModuleDetail /> : <Navigate to="/login" replace />} />
+          <Route path="lesson/:id" element={isAuthenticated ? <LessonPage /> : <Navigate to="/login" replace />} />
+          <Route path="quiz/:id" element={isAuthenticated ? <QuizPage /> : <Navigate to="/login" replace />} />
+          <Route path="profile" element={isAuthenticated ? <Profile /> : <Navigate to="/login" replace />} />
 
-          {/* === روابط الـ Admin المحمية (بقت بنفس العناوين وبدون Sidebar) 🔐 === */}
-          <Route path="admin" element={isAuthenticated ? <AdminDashboard /> : <Navigate to="/login" />} />
-          <Route path="admin/modules" element={isAuthenticated ? <ModulesAdmin /> : <Navigate to="/login" />} />
-          <Route path="admin/quizzes" element={isAuthenticated ? <QuizzesAdmin /> : <Navigate to="/login" />} />
-          <Route path="admin/examens" element={isAuthenticated ? <ExamensAdmin /> : <Navigate to="/login" />} />
-          <Route path="admin/documents" element={isAuthenticated ? <DocumentsAdmin /> : <Navigate to="/login" />} />
-          <Route path="admin/filieres" element={isAuthenticated ? <FilieresAdmin /> : <Navigate to="/login" />} />
-          <Route path="admin/users" element={isAuthenticated ? <UsersAdmin /> : <Navigate to="/login" />} />
-          <Route path="admin/lessons" element={isAuthenticated ? <LessonsAdmin /> : <Navigate to="/login" />} />
+          {/* روابط الإدارة المحمية */}
+          <Route path="admin" element={isAuthenticated && role === 'admin' ? <AdminDashboard /> : <Navigate to="/dashboard" replace />} />
+          <Route path="admin/modules" element={isAuthenticated && role === 'admin' ? <ModulesAdmin /> : <Navigate to="/dashboard" replace />} />
+          <Route path="admin/quizzes" element={isAuthenticated && role === 'admin' ? <QuizzesAdmin /> : <Navigate to="/dashboard" replace />} />
+          <Route path="admin/documents" element={isAuthenticated && role === 'admin' ? <DocumentsAdmin /> : <Navigate to="/dashboard" replace />} />
+          <Route path="admin/filieres" element={isAuthenticated && role === 'admin' ? <FilieresAdmin /> : <Navigate to="/dashboard" replace />} />
+          <Route path="admin/users" element={isAuthenticated && role === 'admin' ? <UsersAdmin /> : <Navigate to="/dashboard" replace />} />
+          <Route path="admin/lessons" element={isAuthenticated && role === 'admin' ? <LessonsAdmin /> : <Navigate to="/dashboard" replace />} />
 
-          {/* تدوير الروابط الغلط */}
-          <Route path="*" element={<Navigate to="/" />} />
+          {/* في حال الدخول لرابط غير معروف */}
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
-
       </Routes>
     </Router>
   );

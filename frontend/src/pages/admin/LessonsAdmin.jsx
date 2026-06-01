@@ -47,7 +47,7 @@ const LessonsAdmin = () => {
     setEditingLesson(null);
     setTitre('');
     setContenu('');
-    setModuleId(modules.length > 0 ? modules[0].id : '');
+    setModuleId('');
     setPdfFile(null);
     setVideos([{ video_url: '', order: 1 }]);
     setMessage({ text: '', type: '' });
@@ -99,6 +99,10 @@ const LessonsAdmin = () => {
       const validVideos = videos.filter(v => v.video_url.trim() !== '');
       
       if (editingLesson) {
+        validVideos.forEach((v, index) => {
+          formData.append(`videos[${index}][video_url]`, v.video_url);
+          formData.append(`videos[${index}][order]`, v.order);
+        });
         formData.append('_method', 'PUT');
         await api.post(`/lessons/${editingLesson.id}`, formData, {
           headers: { 'Content-Type': 'multipart/form-data' }
@@ -268,7 +272,6 @@ const LessonsAdmin = () => {
                   />
                 </div>
 
-                {!editingLesson && (
                   <div className="videos-section">
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
                       <label className="form-label" style={{ margin: 0 }}>Vidéos (Optionnel)</label>
@@ -293,12 +296,6 @@ const LessonsAdmin = () => {
                       </div>
                     ))}
                   </div>
-                )}
-                {editingLesson && (
-                  <div style={{ marginTop: '16px', fontSize: '13px', color: '#64748b', fontStyle: 'italic' }}>
-                    * Note : L'édition des vidéos se fait pour l'instant via la création.
-                  </div>
-                )}
               </form>
             </div>
 

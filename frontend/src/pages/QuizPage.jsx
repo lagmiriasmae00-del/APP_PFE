@@ -1,13 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import api from '../api/axios';
 import '../styles/Quiz.css';
+import { Trophy, XCircle } from 'lucide-react';
 
-const QuizPage = ({ quizId = 1 }) => { // تقدري تبدلي 1 بالـ ID لي بغيتي
+// القراءة من URL عبر /quiz/:id
+const QuizPage = () => {
+    const { id: quizId } = useParams(); // ← يقرأ الـ ID من الـ URL
     const [quiz, setQuiz] = useState(null);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [userAnswers, setUserAnswers] = useState({});
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [results, setResults] = useState(null);
+    const [submitError, setSubmitError] = useState(null);
     // جلب بيانات الكويز
     useEffect(() => {
         api.get(`/quizzes/${quizId}`)
@@ -16,6 +21,20 @@ const QuizPage = ({ quizId = 1 }) => { // تقدري تبدلي 1 بالـ ID ل
     }, [quizId]);
 
     if (!quiz) return <div className="text-center p-20 font-bold text-gray-500">Chargement du quiz...</div>;
+
+    if (!quiz.questions || quiz.questions.length === 0) {
+        return (
+            <div className="text-center p-20">
+                <h2 className="text-2xl font-bold text-gray-800 mb-4">Ce quiz ne contient aucune question pour le moment.</h2>
+                <button 
+                    onClick={() => window.history.back()}
+                    className="bg-indigo-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-indigo-700"
+                >
+                    Retour
+                </button>
+            </div>
+        );
+    }
 
     const currentQuestion = quiz.questions[currentIndex];
     const progress = ((currentIndex + 1) / quiz.questions.length) * 100;
@@ -34,9 +53,15 @@ const QuizPage = ({ quizId = 1 }) => { // تقدري تبدلي 1 بالـ ID ل
 
     const submitQuiz = () => {
         setIsSubmitting(true);
-        api.post(`/quizzes/${quizId}/submit`, { answers: userAnswers })
+        setSubmitError(null);
+        // ✅ الـ route الصحيح هو /quiz/:id/submit (بالمفرد)
+        api.post(`/quiz/${quizId}/submit`, { answers: userAnswers })
             .then(res => setResults(res.data))
-            .catch(err => console.error("Erreur lors de l'envoi:", err))
+            .catch(err => {
+                console.error("Erreur lors de l'envoi:", err);
+                const msg = err.response?.data?.error || 'Une erreur est survenue. Veuillez réessayer.';
+                setSubmitError(msg);
+            })
             .finally(() => setIsSubmitting(false));
     };
 
@@ -45,7 +70,11 @@ const QuizPage = ({ quizId = 1 }) => { // تقدري تبدلي 1 بالـ ID ل
         return (
             <div className="flex justify-center p-6">
                 <div className="result-card bg-white p-10 rounded-3xl shadow-2xl text-center max-w-md w-full border border-gray-100">
-                    <div className="text-6xl mb-4">{results.score >= 50 ? '🎉' : '努力'}</div>
+                    <div className="flex justify-center mb-4">
+                        {results.score >= 50
+                            ? <Trophy className="w-16 h-16 text-yellow-400" strokeWidth={1.5} />
+                            : <XCircle className="w-16 h-16 text-red-400" strokeWidth={1.5} />}
+                    </div>
                     <h2 className="text-3xl font-black text-gray-800 mb-2">{results.status}</h2>
                     <p className="text-gray-500 mb-6 font-medium text-lg">Votre score: <span className="text-indigo-600 font-bold">{results.score}%</span></p>
                     <div className="bg-gray-50 rounded-2xl p-4 mb-6">
@@ -100,17 +129,21 @@ const QuizPage = ({ quizId = 1 }) => { // تقدري تبدلي 1 بالـ ID ل
                 </div>
 
                 {/* Footer Actions */}
-                <div className="mt-10 pt-6 border-t border-gray-100 flex justify-end">
+                <div className="mt-10 pt-6 border-t border-gray-100 flex flex-col items-end gap-3">
+                    {submitError && (
+                        <div className="w-full bg-red-50 border border-red-200 text-red-600 text-sm font-medium px-4 py-3 rounded-xl">
+                            ❌ {submitError}
+                        </div>
+                    )}
                     <button
                         onClick={handleNext}
                         disabled={!userAnswers[currentQuestion.id] || isSubmitting}
                         className="bg-gray-900 text-white px-10 py-4 rounded-2xl font-bold hover:bg-indigo-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-lg"
                     >
-                        {isSubmitting ? 'Envoi...' : (currentIndex === quiz.questions.length - 1 ? 'Terminer le Quiz' : 'Suivant →')}
+                        {isSubmitting ? '⏳ Envoi en cours...' : (currentIndex === quiz.questions.length - 1 ? 'Terminer le Quiz ✓' : 'Suivant →')}
                     </button>
                 </div>
             </div>
-            <p>asmae maxi sihamgit add  khayba hmara bagra</p>
         </div>
         
     );

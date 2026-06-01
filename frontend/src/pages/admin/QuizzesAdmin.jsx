@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import api from '../../api/axios';
+// 🌟 استيراد الأيقونات الاحترافية من مكتبة lucide-react
+import { Pencil, Trash2, X, Plus, BrainCircuit } from 'lucide-react';
 
 const QuizzesAdmin = () => {
   const [quizzes, setQuizzes] = useState([]);
@@ -14,7 +16,6 @@ const QuizzesAdmin = () => {
   const [moduleId, setModuleId] = useState('');
   const [questions, setQuestions] = useState([]);
 
-  // 🛠️ تصحيح الـ URL: حيدنا /admin/ ورجعناها غير /quizzes
   const fetchQuizzes = async () => {
     try {
       setLoading(true);
@@ -27,7 +28,6 @@ const QuizzesAdmin = () => {
     }
   };
 
-  // 🛠️ تصحيح الـ URL: حيدنا /admin/ ورجعناها غير /modules
   const fetchModules = async () => {
     try {
       const res = await api.get('/admin/modules');
@@ -54,6 +54,37 @@ const QuizzesAdmin = () => {
     setModuleId(modules.length > 0 ? modules[0].id : '');
     setQuestions([{ question: '', point: 1, choices: [{ text_choix: '', est_correcte: true }, { text_choix: '', est_correcte: false }] }]);
     setShowModal(true);
+  };
+
+  const openEditModal = async (quiz) => {
+    try {
+      setLoading(true);
+      const res = await api.get(`/quizzes/${quiz.id}`);
+      const fullQuiz = res.data;
+      
+      setEditingQuiz(fullQuiz);
+      setTitre(fullQuiz.titre);
+      setDescription(fullQuiz.description || '');
+      setModuleId(fullQuiz.module_id);
+      
+      if (fullQuiz.questions && fullQuiz.questions.length > 0) {
+        setQuestions(fullQuiz.questions.map(q => ({
+          question: q.question,
+          point: q.point,
+          choices: q.choices && q.choices.length > 0 ? q.choices.map(c => ({
+            text_choix: c.text_choix,
+            est_correcte: Boolean(c.est_correcte)
+          })) : [{ text_choix: '', est_correcte: true }, { text_choix: '', est_correcte: false }]
+        })));
+      } else {
+        setQuestions([{ question: '', point: 1, choices: [{ text_choix: '', est_correcte: true }, { text_choix: '', est_correcte: false }] }]);
+      }
+      setShowModal(true);
+    } catch (err) {
+      setMessage({ text: 'Erreur lors du chargement des détails du quiz.', type: 'error' });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const closeModal = () => {
@@ -152,13 +183,14 @@ const QuizzesAdmin = () => {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div>
             <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight flex items-center gap-3">
-              🧠 Gestion des Quizzes
+              <BrainCircuit className="w-8 h-8 text-indigo-600" /> {/* 🧠 أيقونة احترافية عوض الـ Emoji */}
+              Gestion des Quizzes
               <span className="bg-indigo-100 text-indigo-700 text-sm font-bold px-3 py-1 rounded-full">{quizzes.length}</span>
             </h1>
             <p className="text-gray-500 mt-1">Créez des QCM interactifs pour vos stagiaires.</p>
           </div>
-          <button onClick={openAddModal} className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-semibold shadow-lg transition-all flex items-center gap-2">
-            + Ajouter un Quiz
+          <button onClick={openAddModal} className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-semibold shadow-lg transition-all flex items-center gap-2 cursor-pointer">
+            <Plus className="w-5 h-5" /> Ajouter un Quiz
           </button>
         </div>
 
@@ -168,13 +200,14 @@ const QuizzesAdmin = () => {
               <tr className="bg-gray-50 border-b">
                 <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase">Titre du Quiz</th>
                 <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase">Module associé</th>
+                <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase">Questions</th>
                 <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
               {quizzes.length === 0 ? (
                 <tr>
-                  <td colSpan="3" className="px-6 py-8 text-center text-gray-500">Aucun quiz trouvé.</td>
+                  <td colSpan="4" className="px-6 py-8 text-center text-gray-500">Aucun quiz trouvé.</td>
                 </tr>
               ) : (
                 quizzes.map((quiz) => (
@@ -182,9 +215,30 @@ const QuizzesAdmin = () => {
                     <td className="px-6 py-4 font-semibold text-gray-900">{quiz.titre}</td>
                     <td className="px-6 py-4 text-gray-600">{quiz.module?.titre || quiz.module?.nom || '—'}</td>
                     <td className="px-6 py-4">
-                      <button onClick={() => handleDelete(quiz.id)} className="bg-red-50 hover:bg-red-100 text-red-600 p-2 rounded-lg transition-colors" title="Supprimer">
-                        🗑️
-                      </button>
+                      {quiz.questions?.length > 0 ? (
+                        <span className="bg-indigo-100 text-indigo-700 text-xs font-bold px-2 py-1 rounded-md">{quiz.questions.length} Question(s)</span>
+                      ) : (
+                        <span className="text-gray-400 text-xs italic">Aucune question</span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4">
+                      {/* 🌟 هنا التغيير الكبير: أزرار احترافية بـ Lucide Icons و Hover نظيف */}
+                      <div className="flex gap-2">
+                        <button 
+                          onClick={() => openEditModal(quiz)} 
+                          className="bg-blue-50 hover:bg-blue-100 text-blue-600 p-2 rounded-lg border border-transparent hover:border-blue-200 transition-all cursor-pointer" 
+                          title="Modifier"
+                        >
+                          <Pencil className="w-4 h-4" />
+                        </button>
+                        <button 
+                          onClick={() => handleDelete(quiz.id)} 
+                          className="bg-red-50 hover:bg-red-100 text-red-600 p-2 rounded-lg border border-transparent hover:border-red-200 transition-all cursor-pointer" 
+                          title="Supprimer"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))
@@ -200,7 +254,9 @@ const QuizzesAdmin = () => {
               
               <div className="p-6 border-b flex justify-between items-center">
                 <h2 className="text-xl font-bold text-gray-900">{editingQuiz ? 'Modifier le Quiz' : 'Créer un Nouveau Quiz'}</h2>
-                <button onClick={closeModal} className="text-gray-400 hover:text-gray-600">✕</button>
+                <button onClick={closeModal} className="text-gray-400 hover:text-gray-600 cursor-pointer">
+                  <X className="w-5 h-5" />
+                </button>
               </div>
 
               <div className="p-6 overflow-y-auto flex-1">
@@ -222,14 +278,16 @@ const QuizzesAdmin = () => {
                   <div>
                     <div className="flex justify-between items-center mb-4">
                       <h3 className="font-bold text-lg">Questions ({questions.length})</h3>
-                      <button type="button" onClick={handleAddQuestion} className="bg-indigo-100 text-indigo-700 px-4 py-2 rounded-lg font-semibold text-sm hover:bg-indigo-200 transition-colors">
+                      <button type="button" onClick={handleAddQuestion} className="bg-indigo-100 text-indigo-700 px-4 py-2 rounded-lg font-semibold text-sm hover:bg-indigo-200 transition-colors cursor-pointer">
                         + Ajouter Question
                       </button>
                     </div>
 
                     {questions.map((q, qIndex) => (
                       <div key={qIndex} className="bg-gray-50 border border-gray-200 p-5 rounded-2xl mb-6 relative">
-                        <button type="button" onClick={() => handleRemoveQuestion(qIndex)} className="absolute top-3 right-4 text-red-400 hover:text-red-600 font-bold" title="Supprimer la question">✕</button>
+                        <button type="button" onClick={() => handleRemoveQuestion(qIndex)} className="absolute top-3 right-4 text-red-400 hover:text-red-600 font-bold p-1 cursor-pointer" title="Supprimer la question">
+                          <X className="w-4 h-4" />
+                        </button>
                         
                         <div className="grid grid-cols-4 gap-4 mb-5">
                           <div className="col-span-3">
@@ -249,11 +307,13 @@ const QuizzesAdmin = () => {
                               <input type="radio" name={`correct_${qIndex}`} checked={c.est_correcte} onChange={e => handleChoiceChange(qIndex, cIndex, 'est_correcte', e.target.checked)} className="w-4 h-4 text-indigo-600 focus:ring-indigo-500 cursor-pointer" />
                               <input type="text" value={c.text_choix} onChange={e => handleChoiceChange(qIndex, cIndex, 'text_choix', e.target.value)} required className={`flex-1 px-3 py-1.5 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none text-sm ${c.est_correcte ? 'bg-indigo-50 border-indigo-300' : 'bg-white'}`} placeholder={`Choix ${cIndex + 1}`} />
                               {q.choices.length > 2 && (
-                                <button type="button" onClick={() => handleRemoveChoice(qIndex, cIndex)} className="text-red-400 hover:text-red-600 font-bold p-1">✕</button>
+                                <button type="button" onClick={() => handleRemoveChoice(qIndex, cIndex)} className="text-red-400 hover:text-red-600 font-bold p-1 cursor-pointer">
+                                  <X className="w-3 h-3" />
+                                </button>
                               )}
                             </div>
                           ))}
-                          <button type="button" onClick={() => handleAddChoice(qIndex)} className="text-xs text-indigo-600 font-bold mt-2 hover:underline">
+                          <button type="button" onClick={() => handleAddChoice(qIndex)} className="text-xs text-indigo-600 font-bold mt-2 hover:underline cursor-pointer">
                             + Ajouter une option
                           </button>
                         </div>
@@ -264,8 +324,8 @@ const QuizzesAdmin = () => {
               </div>
 
               <div className="p-6 border-t bg-gray-50 rounded-b-2xl flex justify-end gap-3">
-                <button type="button" onClick={closeModal} className="px-5 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-200 rounded-xl transition-colors">Annuler</button>
-                <button type="submit" form="quiz-form" className="px-6 py-2.5 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-lg transition-all">Enregistrer le Quiz</button>
+                <button type="button" onClick={closeModal} className="px-5 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-200 rounded-xl transition-colors cursor-pointer">Annuler</button>
+                <button type="submit" form="quiz-form" className="px-6 py-2.5 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-lg transition-all cursor-pointer">Enregistrer le Quiz</button>
               </div>
 
             </div>

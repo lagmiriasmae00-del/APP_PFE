@@ -22,7 +22,7 @@ const ModulesList = () => {
 
   return (
     <div className="container mx-auto px-6 py-10">
-      <h1 className="text-3xl font-extrabold text-gray-900 mb-8">📚 Mes Modules</h1>
+      <h1 className="text-3xl font-extrabold text-gray-900 mb-8"> Mes Modules</h1>
       
       {modules.length === 0 ? (
         <div className="bg-gray-50 p-12 rounded-2xl text-center border-2 border-dashed border-gray-200">
@@ -37,7 +37,6 @@ const ModulesList = () => {
                   <span className="bg-blue-100 text-blue-700 text-xs font-bold px-3 py-1 rounded-full uppercase">
                     Module
                   </span>
-                  <span className="text-gray-400 text-sm font-medium">Niveau {module.niveau}</span>
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-4 group-hover:text-blue-600 transition-colors">
                   {module.titre}

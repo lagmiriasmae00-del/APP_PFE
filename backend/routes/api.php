@@ -18,16 +18,19 @@ Route::middleware('throttle:5,1')->post('/login', [AuthController::class, 'login
 // 2. Protected Routes
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/files/{id}/download', [DocumentController::class, 'downloadFile']);
+    
     // Common routes (Admin + Stagiaire)
     Route::get('/profile', [AuthController::class, 'userProfile']); 
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/check-auth', fn() => response()->json(['authenticated' => true]));
     Route::get('/dashboard-stats', [AuthController::class, 'getStats']);
 
-    // Stagiaire routes
+    // Stagiaire routes (Accessible also by Admin if needed for testing, but routed properly)
     Route::middleware('role:stagiaire,admin')->group(function () {
-        Route::get('/my-modules', [ModuleController::class, 'index']); 
+        Route::get('/my-modules', [ModuleController::class, 'index']); // 🛠️ خاص بالـ Stagiaire فقط (فيلتر بالشعبة)
         Route::get('/module/{id}', [ModuleController::class, 'show']);
+        Route::get('/lessons/{id}', [LessonController::class, 'show']);
+        Route::get('/quizzes/{id}', [QuizController::class, 'show']);
         Route::post('/quiz/{id}/submit', [QuizController::class, 'submit']);
         Route::get('/my-results', [QuizController::class, 'myResults']);
     });
@@ -35,23 +38,24 @@ Route::middleware('auth:sanctum')->group(function () {
     // Admin routes
     Route::middleware('role:admin')->group(function () {
         // Modules CRUD (Admin - GET all for admin dashboard)
-        Route::get('/admin/modules', [ModuleController::class, 'index']);
+        Route::get('/admin/modules', [ModuleController::class, 'adminIndex']); // 🛠️ تم التعديل لـ adminIndex
         Route::post('/modules', [ModuleController::class, 'store']);
         Route::put('/modules/{id}', [ModuleController::class, 'update']);
         Route::delete('/modules/{id}', [ModuleController::class, 'destroy']);
         
         // Quizzes CRUD (Admin - GET all for admin dashboard)
-        Route::get('/admin/quizzes', [QuizController::class, 'index']);
+        Route::get('/admin/quizzes', [QuizController::class, 'adminIndex']); // 🛠️ تم التعديل لـ adminIndex
         Route::post('/quizzes', [QuizController::class, 'store']);
         Route::put('/quizzes/{id}', [QuizController::class, 'update']);
         Route::delete('/quizzes/{id}', [QuizController::class, 'destroy']);
         
         // Documents CRUD
+        Route::get('/admin/documents', [DocumentController::class, 'index']);
         Route::post('/documents', [DocumentController::class, 'store']);
         Route::delete('/documents/{id}', [DocumentController::class, 'destroy']);
         
         // Lessons CRUD
-        Route::get('/admin/lessons', [LessonController::class, 'index']);
+        Route::get('/admin/lessons', [LessonController::class, 'adminIndex']); // 🛠️ تم التعديل لـ adminIndex
         Route::post('/lessons', [LessonController::class, 'store']);
         Route::put('/lessons/{id}', [LessonController::class, 'update']);
         Route::delete('/lessons/{id}', [LessonController::class, 'destroy']);

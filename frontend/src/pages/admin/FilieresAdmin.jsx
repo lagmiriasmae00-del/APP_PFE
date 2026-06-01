@@ -20,9 +20,11 @@ const FilieresAdmin = () => {
     try {
       setLoading(true);
       const res = await api.get('/admin/filieres');
-      setFilieres(res.data);
+      // protect against non-array response
+      setFilieres(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
       console.error(err);
+      setFilieres([]);
       setMessage({ text: 'Erreur lors du chargement des filières.', type: 'error' });
     } finally {
       setLoading(false);
@@ -119,8 +121,9 @@ const FilieresAdmin = () => {
   // سبينر ديال التحميل
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+      <div className="flex flex-col justify-center items-center min-h-screen bg-gray-50 gap-4">
+        <div className="animate-spin rounded-full h-14 w-14 border-4 border-indigo-200 border-t-indigo-600"></div>
+        <p className="text-gray-500 font-medium">Chargement des filières...</p>
       </div>
     );
   }

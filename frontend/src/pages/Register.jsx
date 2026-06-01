@@ -2,19 +2,27 @@ import React, { useState, useEffect } from 'react';
 import api from '../api/axios';
 import { useDispatch } from 'react-redux';
 import { loginSuccess } from '../features/authSlice';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
+import { 
+  User, 
+  Mail, 
+  Lock, 
+  GraduationCap, 
+  Layers, 
+  AlertCircle 
+} from 'lucide-react';
 
 const Register = () => {
-  // 1. State باش نخزنو فيها الشعب لي غيجيو من الداتابيز
   const [filieres, setFilieres] = useState([]);
   
   const [formData, setFormData] = useState({
     name: '', 
     email: '', 
     password: '', 
+    password_confirmation: '', 
     nom: '', 
     prenom: '', 
-    filiere_id: '', // غنخليوها خاوية في الأول حيت غتغمر من بعد
+    filiere_id: '', 
     niveau: '1'
   });
   
@@ -22,12 +30,10 @@ const Register = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // 2. useEffect باش نجيبو الشعب أول ما تحل الصفحة
   useEffect(() => {
     api.get('/filieres')
       .then(res => {
         setFilieres(res.data);
-        // أوتوماتيكياً كنختارو أول شعبة رجعات من الداتابيز كقيمة بدئية
         if (res.data.length > 0) {
           setFormData(prev => ({ ...prev, filiere_id: res.data[0].id }));
         }
@@ -42,14 +48,19 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMsg('');
+
+    if (formData.password !== formData.password_confirmation) {
+      setErrorMsg("Les mots de passe ne correspondent pas !");
+      return;
+    }
+
     try {
       const res = await api.post('/register', formData);
       dispatch(loginSuccess(res.data));
       navigate('/dashboard');
     } catch (err) {
-      // حماية الكود من الـ Crash ومطابقة الخطأ أوتوماتيكياً
       if (err.response && err.response.data && err.response.data.errors) {
-        const firstError = Object.values(err.response.data.errors);
+        const firstError = Object.values(err.response.data.errors)[0];
         setErrorMsg(firstError);
       } else if (err.response && err.response.data && err.response.data.message) {
         setErrorMsg(err.response.data.message);
@@ -61,84 +72,129 @@ const Register = () => {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-50/50 p-4">
-      <div className="bg-white p-8 rounded-3xl shadow-xl border border-gray-100 w-full max-w-md">
+      {/* الـ Card دابا ملموم ومجموع بلا Scroll داخلي */}
+      <div className="bg-white p-6 md:p-8 rounded-3xl shadow-xl border border-gray-100 w-full max-w-xl">
         
-        <h2 className="text-3xl font-black mb-2 text-center text-gray-800 tracking-tight">Créer un compte</h2>
-        <p className="text-center text-gray-400 text-sm mb-8">Rejoignez EduLink dès aujourd'hui</p>
+        <div className="text-center mb-6">
+          <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Créer un compte</h2>
+          <p className="text-gray-500 text-sm mt-1">Rejoignez EduLink dès aujourd'hui</p>
+        </div>
         
         {errorMsg && (
-          <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 rounded-xl text-red-700 text-sm font-medium">
-            ⚠️ {errorMsg}
+          <div className="mb-4 p-3.5 bg-red-50 border-l-4 border-red-500 rounded-xl text-red-700 text-sm font-medium flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 shrink-0" />
+            <span>{errorMsg}</span>
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           
-          {/* Nom & Prénom */}
+          {/* 🌟 السطر 1: Nom & Prénom مجموعة فـ Grid */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Nom</label>
-              <input name="nom" type="text" placeholder="Ghanem" className="w-full p-3 border border-gray-200 rounded-xl outline-none font-medium" onChange={handleChange} required />
+              <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Nom</label>
+              <input name="nom" value={formData.nom} type="text" placeholder="" className="w-full px-4 py-2 border border-gray-200 rounded-xl outline-none font-medium text-sm focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 transition" onChange={handleChange} required />
             </div>
             <div>
-              <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Prénom</label>
-              <input name="prenom" type="text" placeholder="Asmae" className="w-full p-3 border border-gray-200 rounded-xl outline-none font-medium" onChange={handleChange} required />
+              <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Prénom</label>
+              <input name="prenom" value={formData.prenom} type="text" placeholder="" className="w-full px-4 py-2 border border-gray-200 rounded-xl outline-none font-medium text-sm focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 transition" onChange={handleChange} required />
             </div>
           </div>
 
-          {/* Username */}
-          <div>
-            <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Nom d'utilisateur</label>
-            <input name="name" type="text" placeholder="asmae_gh" className="w-full p-3 border border-gray-200 rounded-xl outline-none font-medium" onChange={handleChange} required />
+          {/* 🌟 السطر 2: Username & Email فـ نفس السطر باش نربحو المساحة وندمروا الـ Scroll */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Nom d'utilisateur</label>
+              <div className="relative">
+                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+                  <User className="w-4 h-4" />
+                </span>
+                <input name="name" value={formData.name} type="text" placeholder="" className="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-xl outline-none font-medium text-sm focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 transition" onChange={handleChange} required />
+              </div>
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Adresse Email</label>
+              <div className="relative">
+                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+                  <Mail className="w-4 h-4" />
+                </span>
+                <input name="email" value={formData.email} type="email" placeholder="" className="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-xl outline-none font-medium text-sm focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 transition" onChange={handleChange} required />
+              </div>
+            </div>
           </div>
 
-          {/* Email */}
-          <div>
-            <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Adresse Email</label>
-            <input name="email" type="email" placeholder="name@example.com" className="w-full p-3 border border-gray-200 rounded-xl outline-none font-medium" onChange={handleChange} required />
-          </div>
-
-          {/* Password */}
-          <div>
-            <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Mot de passe</label>
-            <input name="password" type="password" placeholder="••••••••" className="w-full p-3 border border-gray-200 rounded-xl outline-none font-medium" onChange={handleChange} required />
+          {/* 🌟 السطر 3: Password & Confirmation فـ نفس السطر */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Mot de passe</label>
+              <div className="relative">
+                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+                  <Lock className="w-4 h-4" />
+                </span>
+                <input name="password" value={formData.password} type="password" placeholder="••••••••" className="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-xl outline-none font-medium text-sm focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 transition" onChange={handleChange} required />
+              </div>
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Confirmer le mot de passe</label>
+              <div className="relative">
+                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+                  <Lock className="w-4 h-4" />
+                </span>
+                <input name="password_confirmation" value={formData.password_confirmation} type="password" placeholder="••••••••" className="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-xl outline-none font-medium text-sm focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 transition" onChange={handleChange} required />
+              </div>
+            </div>
           </div>
           
-          {/* Filière الديناميكية */}
-          <div>
-            <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Filière</label>
-            <select 
-              name="filiere_id" 
-              value={formData.filiere_id} 
-              className="w-full p-3 border border-gray-200 rounded-xl bg-white outline-none font-medium" 
-              onChange={handleChange} 
-              required
-            >
-              {/* هنا كيدور الفتيل على الشعب اللي جاو من الداتابيز */}
-              {filieres.length === 0 ? (
-                <option>Chargement des filières...</option>
-              ) : (
-                filieres.map(filiere => (
-                  <option key={filiere.id} value={filiere.id}>
-                    {filiere.nom}
-                  </option>
-                ))
-              )}
-            </select>
+          {/* 🌟 السطر 4: Filière & Niveau فـ نفس السطر */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Filière</label>
+              <div className="relative">
+                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400 pointer-events-none">
+                  <GraduationCap className="w-4 h-4" />
+                </span>
+                <select name="filiere_id" value={formData.filiere_id} className="w-full pl-9 pr-8 py-2 border border-gray-200 rounded-xl bg-white outline-none font-medium text-sm focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 transition appearance-none" onChange={handleChange} required>
+                  {filieres.length === 0 ? (
+                    <option>Chargement...</option>
+                  ) : (
+                    filieres.map(filiere => (
+                      <option key={filiere.id} value={filiere.id}>
+                        {filiere.nom}
+                      </option>
+                    ))
+                  )}
+                </select>
+                <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-400 text-[10px]">▼</div>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Niveau</label>
+              <div className="relative">
+                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400 pointer-events-none">
+                  <Layers className="w-4 h-4" />
+                </span>
+                <select name="niveau" value={formData.niveau} className="w-full pl-9 pr-8 py-2 border border-gray-200 rounded-xl bg-white outline-none font-medium text-sm focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 transition appearance-none" onChange={handleChange}>
+                  <option value="1">1ère année</option>
+                  <option value="2">2ème année</option>
+                </select>
+                <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-400 text-[10px]">▼</div>
+              </div>
+            </div>
           </div>
 
-          {/* Niveau */}
-          <div>
-            <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Niveau</label>
-            <select name="niveau" value={formData.niveau} className="w-full p-3 border border-gray-200 rounded-xl bg-white outline-none font-medium" onChange={handleChange}>
-              <option value="1">1ère année</option>
-              <option value="2">2ème année</option>
-            </select>
+          <div className="pt-2">
+            <button type="submit" className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white py-2.5 rounded-xl font-bold shadow-md hover:shadow-lg transition cursor-pointer text-sm">
+              S'inscrire
+            </button>
+            <p className="text-center text-xs text-gray-500 mt-3">
+              Vous avez déjà un compte ?{' '}
+              <Link to="/login" className="text-emerald-600 hover:underline font-semibold">
+                Connexion
+              </Link>
+            </p>
           </div>
 
-          <button type="submit" className="w-full mt-6 bg-gradient-to-r from-indigo-600 to-blue-600 text-white p-4 rounded-xl font-bold hover:opacity-95 shadow-lg transition-all">
-            S'inscrire
-          </button>
         </form>
       </div>
     </div>

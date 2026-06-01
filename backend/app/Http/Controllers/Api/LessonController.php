@@ -14,10 +14,33 @@ use Illuminate\Http\JsonResponse;
 
 class LessonController extends Controller
 {
+    public function adminIndex(): JsonResponse
+    {
+        $lessons = Lesson::with(['module', 'videos'])->get();
+        return response()->json($lessons);
+    }
+
     public function index(): JsonResponse
     {
-        $lessons = Lesson::with(['module', 'videos'])->orderBy('id', 'desc')->get();
+        $user = auth()->user()->load('profile');
+        $filiere_id = $user->profile->filiere_id;
+        $niveau = $user->profile->niveau;
+
+        $lessons = Lesson::whereHas('module', function ($q) use ($filiere_id, $niveau) {
+            $q->where('filiere_id', $filiere_id)
+              ->where('niveau', $niveau);
+        })->with(['module', 'videos'])->get();
+
         return response()->json($lessons);
+    }
+
+    public function show($id): JsonResponse
+    {
+        $lesson = Lesson::with(['module', 'videos'])->findOrFail($id);
+        
+        // Security checks can be added here if needed
+        
+        return response()->json($lesson);
     }
 
     public function store(Request $request): JsonResponse
@@ -61,7 +84,7 @@ class LessonController extends Controller
                     LessonVideo::create([
                         'video_url' => $video['video_url'],
                         'order' => $video['order'],
-                        'lessons_id' => $lesson->id
+                        'lesson_id' => $lesson->id
                     ]);
                 }
             }
@@ -80,26 +103,44 @@ class LessonController extends Controller
             'titre' => 'sometimes|string|max:255',
             'module_id' => 'sometimes|integer|exists:modules,id',
             'contenu' => 'sometimes|nullable|string',
-            'pdf_file' => 'sometimes|nullable|file|mimes:pdf|max:10240'
+            'pdf_file' => 'sometimes|nullable|file|mimes:pdf|max:10240',
+            'videos' => 'nullable|array', 
+            'videos.*.video_url' => 'required|url',
+            'videos.*.order' => 'required|integer'
         ]);
 
-        if ($request->hasFile('pdf_file')) {
-            if ($lesson->pdf_url) {
-                $oldPath = str_replace('/storage/', 'public/', $lesson->pdf_url);
-                Storage::delete($oldPath);
+        return DB::transaction(function () use ($request, $lesson) {
+            if ($request->hasFile('pdf_file')) {
+                if ($lesson->pdf_url) {
+                    $oldPath = str_replace('/storage/', 'public/', $lesson->pdf_url);
+                    Storage::delete($oldPath);
+                }
+
+                $file = $request->file('pdf_file');
+                $fileName = Str::uuid() . '.pdf';
+                $path = $file->storeAs('lessons_pdfs', $fileName, 'public');
+                $lesson->pdf_url = '/storage/' . $path;
             }
 
-            $file = $request->file('pdf_file');
-            $fileName = Str::uuid() . '.pdf';
-            $path = $file->storeAs('lessons_pdfs', $fileName, 'public');
-            $lesson->pdf_url = '/storage/' . $path;
-        }
+            $lesson->update($request->only(['titre', 'module_id', 'contenu']));
 
-        $lesson->update($request->only(['titre', 'module_id', 'contenu']));
+            if ($request->has('videos')) {
+                // Delete old videos
+                $lesson->videos()->delete();
+                // Create new videos
+                foreach ($request->videos as $video) {
+                    LessonVideo::create([
+                        'video_url' => $video['video_url'],
+                        'order' => $video['order'],
+                        'lesson_id' => $lesson->id
+                    ]);
+                }
+            }
 
-        Log::info('Lesson updated', ['lesson_id' => $lesson->id, 'admin_id' => auth()->id()]);
+            Log::info('Lesson updated', ['lesson_id' => $lesson->id, 'admin_id' => auth()->id()]);
 
-        return response()->json($lesson);
+            return response()->json($lesson->load('videos'));
+        });
     }
 
     public function destroy($id): JsonResponse

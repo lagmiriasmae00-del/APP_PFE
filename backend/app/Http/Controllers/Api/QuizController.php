@@ -14,10 +14,33 @@ use Illuminate\Support\Facades\Log;
 
 class QuizController extends Controller
 {
+    public function adminIndex(): JsonResponse
+    {
+        $quizzes = Quizze::with(['module', 'questions'])->get();
+        return response()->json($quizzes);
+    }
+
     public function index(): JsonResponse
     {
-        $quizzes = Quizze::with(['module'])->get();
+        $user = auth()->user()->load('profile');
+        $filiere_id = $user->profile->filiere_id;
+        $niveau = $user->profile->niveau;
+
+        $quizzes = Quizze::whereHas('module', function ($q) use ($filiere_id, $niveau) {
+            $q->where('filiere_id', $filiere_id)
+              ->where('niveau', $niveau);
+        })->with(['module'])->get();
+
         return response()->json($quizzes);
+    }
+
+    public function show($id): JsonResponse
+    {
+        $quiz = Quizze::with(['module', 'questions.choices'])->findOrFail($id);
+        
+        // Security checks can be added here if needed
+        
+        return response()->json($quiz);
     }
 
     public function submit(Request $request, int $quizId): JsonResponse
@@ -92,8 +115,7 @@ class QuizController extends Controller
                         'score' => round($score, 2),
                         'passe' => $passed,
                         'date_passe' => now(),
-                        'correct_answers' => $correctAnswersCount,
-                        'total_questions' => $totalQuestions
+                        'reponse_correcte' => $correctAnswersCount
                     ]
                 );
 
@@ -104,6 +126,9 @@ class QuizController extends Controller
                     'passed' => $passed,
                     'ip' => request()->ip()
                 ]);
+
+                // 🧹 مسح الكاش ديال الإحصائيات باش يبان في الـ Dashboard بلي كمل الكويز
+                \Illuminate\Support\Facades\Cache::forget("user_{$user->id}_stats");
 
                 return response()->json([
                     'message' => 'Quiz completed successfully',
@@ -189,17 +214,51 @@ class QuizController extends Controller
 
         $validated = $request->validate([
             'titre' => 'sometimes|string|max:255',
-            'description' => 'sometimes|nullable|string'
+            'module_id' => 'sometimes|integer|exists:modules,id',
+            'questions' => 'nullable|array',
+            'questions.*.question' => 'required_with:questions|string',
+            'questions.*.point' => 'nullable|integer|min:1',
+            'questions.*.choices' => 'nullable|array',
+            'questions.*.choices.*.text_choix' => 'required_with:questions.*.choices|string',
+            'questions.*.choices.*.est_correcte' => 'nullable|boolean',
         ]);
 
-        $quiz->update($validated);
+        return DB::transaction(function () use ($quiz, $validated, $id) {
+            $quiz->update([
+                'titre' => $validated['titre'] ?? $quiz->titre,
+                'module_id' => $validated['module_id'] ?? $quiz->module_id,
+            ]);
 
-        Log::info('Quiz updated', [
-            'quiz_id' => $id,
-            'admin_id' => auth()->id()
-        ]);
+            if (isset($validated['questions'])) {
+                // Delete old questions (which will cascade delete choices if DB is set up, but we'll do it manually just in case)
+                foreach ($quiz->questions as $question) {
+                    $question->choices()->delete();
+                    $question->delete();
+                }
 
-        return response()->json($quiz);
+                // Insert new questions
+                foreach ($validated['questions'] as $qData) {
+                    $question = $quiz->questions()->create([
+                        'question' => $qData['question'],
+                        'point'    => $qData['point'] ?? 1,
+                    ]);
+
+                    foreach ($qData['choices'] ?? [] as $cData) {
+                        $question->choices()->create([
+                            'text_choix'  => $cData['text_choix'],
+                            'est_correcte'=> $cData['est_correcte'] ?? false,
+                        ]);
+                    }
+                }
+            }
+
+            Log::info('Quiz updated with questions', [
+                'quiz_id' => $id,
+                'admin_id' => auth()->id()
+            ]);
+
+            return response()->json($quiz->load('questions.choices'));
+        });
     }
 
     public function destroy(int $id): JsonResponse

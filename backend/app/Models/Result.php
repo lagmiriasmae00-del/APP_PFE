@@ -15,8 +15,7 @@ class Result extends Model
         'user_id',
         'quiz_id',
         'date_passe',
-        'correct_answers',
-        'total_questions'
+        'reponse_correcte'
     ];
 
     protected $casts = [

@@ -58,7 +58,7 @@ class DocumentController extends Controller
             'titre' => $request->titre,
             'type' => $request->type,
             'niveau' => $request->niveau,
-            'year' => $request->year,
+            'annee' => $request->year,
             'filiere_id' => $request->filiere_id,
             'module_id' => $request->module_id,
         ]);

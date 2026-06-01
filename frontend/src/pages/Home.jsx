@@ -19,18 +19,6 @@ const Home = () => {
             EduLink connecte les esprits brillants avec des ressources d'exception.
           </p>
           
-          <div className="flex flex-col sm:flex-row justify-center md:justify-start gap-4 pt-4">
-            <Link 
-              to="/register" 
-              className="bg-blue-600 text-white px-8 py-4 rounded-full font-bold shadow-lg hover:bg-blue-700 transition-all text-center"
-            >
-              Commencer gratuitement
-            </Link>
-            <button className="flex items-center justify-center space-x-2 text-gray-700 font-semibold hover:text-blue-600 transition px-4 py-4">
-              <span className="bg-white border border-gray-200 p-2 rounded-full shadow-sm">▶</span>
-              <span>Voir la démo</span>
-            </button>
-          </div>
 
 
         </div>

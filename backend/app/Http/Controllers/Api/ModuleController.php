@@ -13,28 +13,45 @@ class ModuleController extends Controller
     /**
      * Get modules (Admin sees all, Stagiaire sees only theirs)
      */
+    public function adminIndex(): JsonResponse
+    {
+        $modules = Module::with(['filiere', 'quizzes', 'lessons'])->get();
+        return response()->json($modules);
+    }
+
     public function index(): JsonResponse
     {
-        $user = auth()->user();
+        $user = auth()->user()->load('profile');
         
-        // تعديل الشرط: إذا كان الـ role ف الـ user نيشان أو ف الـ profile
-        $isAdmin = ($user->role === 'admin') || ($user->profile && $user->profile->role === 'admin');
-
-        if ($isAdmin) {
-            $modules = Module::with(['filiere', 'quizzes', 'lessons'])->get();
-            return response()->json($modules);
-        }
-        
-        // للطالب: تصفية حسب الشعبة والمستوى
-        $filiere_id = $user->profile ? $user->profile->filiere_id : null;
-        $niveau = $user->profile ? $user->profile->niveau : null;
-
-        $modules = Module::where('filiere_id', $filiere_id)
-                    ->where('niveau', $niveau)
+        $modules = Module::where('filiere_id', $user->profile->filiere_id)
+                    ->where('niveau', $user->profile->niveau)
                     ->with(['filiere', 'quizzes', 'lessons'])
                     ->get();
 
         return response()->json($modules);
+    }
+
+    /**
+     * Get a single module with its relations
+     */
+    public function show(int $id): JsonResponse
+    {
+        $user = auth()->user();
+        
+        $isAdmin = ($user->role === 'admin') || ($user->profile && $user->profile->role === 'admin');
+        
+        $module = Module::with(['filiere', 'quizzes', 'lessons.videos', 'documents.files'])->findOrFail($id);
+
+        if (!$isAdmin) {
+            $filiere_id = $user->profile ? $user->profile->filiere_id : null;
+            $niveau = $user->profile ? $user->profile->niveau : null;
+
+            if ($module->filiere_id !== $filiere_id || $module->niveau !== $niveau) {
+                return response()->json(['error' => 'Access denied'], 403);
+            }
+        }
+
+        return response()->json($module);
     }
 
     /**

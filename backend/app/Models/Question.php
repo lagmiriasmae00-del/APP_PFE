@@ -9,11 +9,11 @@ class Question extends Model
 {
     use SoftDeletes;
 
-    protected $fillable = ['question', 'point', 'quizze_id'];
+    protected $fillable = ['question', 'point', 'quiz_id'];
 
     public function quizze()
     {
-        return $this->belongsTo(Quizze::class, 'quizze_id');
+        return $this->belongsTo(Quizze::class, 'quiz_id');
     }
 
     public function choices()
