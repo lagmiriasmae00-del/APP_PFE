@@ -19,6 +19,19 @@ class DocumentController extends Controller
         return response()->json($documents);
     }
 
+    public function studentIndex()
+    {
+        $user = auth()->user()->load('profile');
+        
+        $documents = Document::with(['module', 'files'])
+            ->where('filiere_id', $user->profile->filiere_id)
+            ->where('niveau', $user->profile->niveau)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json($documents);
+    }
+
    public function store(Request $request)
     {
         
@@ -158,10 +171,9 @@ class DocumentController extends Controller
         
 
         foreach ($document->files as $file) {
-            $filePath = str_replace('/storage/', 'public/', $file->file_url);
-            Storage::delete($filePath);
+            $filePath = str_replace('/storage/', '', $file->file_url);
+            Storage::disk('public')->delete($filePath);
             $file->delete(); 
-
         }
         
         
@@ -180,9 +192,9 @@ class DocumentController extends Controller
 
         
 
-        $filePath = str_replace('/storage/', 'public/', $file->file_url);
+        $filePath = str_replace('/storage/', '', $file->file_url);
 
-        if (!Storage::exists($filePath)) {
+        if (!Storage::disk('public')->exists($filePath)) {
             return response()->json(['message' => 'Fichier introuvable'], 404);
         }
 
@@ -190,7 +202,6 @@ class DocumentController extends Controller
 
         $filename = $file->document->titre . '_' . $file->file_type . '.pdf';
         
-        return Storage::download($filePath, $filename);
+        return Storage::disk('public')->download($filePath, $filename);
     }
 }
-

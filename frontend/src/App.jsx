@@ -18,6 +18,7 @@ import ModuleDetail from './pages/ModuleDetail';
 import LessonPage from './pages/LessonPage';
 import QuizPage from './pages/QuizPage';
 import Profile from './pages/Profile';
+import DocumentsList from './pages/DocumentsList';
 
 
 
@@ -68,6 +69,7 @@ function App() {
           {}
           <Route path="dashboard" element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" replace />} />
           <Route path="modules" element={isAuthenticated ? <ModulesList /> : <Navigate to="/login" replace />} />
+          <Route path="documents" element={isAuthenticated ? <DocumentsList /> : <Navigate to="/login" replace />} />
           <Route path="module/:id" element={isAuthenticated ? <ModuleDetail /> : <Navigate to="/login" replace />} />
           <Route path="lesson/:id" element={isAuthenticated ? <LessonPage /> : <Navigate to="/login" replace />} />
           <Route path="quiz/:id" element={isAuthenticated ? <QuizPage /> : <Navigate to="/login" replace />} />
