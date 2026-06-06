@@ -23,9 +23,9 @@ const Home = () => {
 
         </div>
 
-        {/* الصورة - Right Side */}
+        
         <div className="md:w-1/2 relative">
-          {/* الخلفية الزرقاء اللي ورا التصويرة */}
+          
           <div className="absolute inset-0 bg-blue-100 rounded-3xl rotate-3 scale-105 -z-10"></div>
           <img 
             src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
@@ -35,7 +35,7 @@ const Home = () => {
         </div>
       </section>
 
-      {/* 2. WHY CHOOSE US - علاش EduLink ؟ */}
+      
       <section className="bg-gray-50 py-20">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
@@ -77,7 +77,7 @@ const Home = () => {
         </div>
       </section>
 
-      {/* 3. TESTIMONIALS - داكشي اللي كيقولو الطلبة */}
+      
       <section className="py-20 bg-white text-center">
         <h3 className="text-2xl font-bold text-gray-900 mb-4">Ce que disent nos étudiants</h3>
         <p className="text-gray-500 max-w-xl mx-auto px-6">

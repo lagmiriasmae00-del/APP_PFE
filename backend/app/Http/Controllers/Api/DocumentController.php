@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use App\Models\DocumentFile;
 
+
 class DocumentController extends Controller
 {
    public function index()
@@ -172,25 +173,26 @@ class DocumentController extends Controller
     }
     
 
-    public function downloadFile($fileId)
-    {
-        
+    public function downloadFile($id) //  رجعناها $id باش تطابق مع الـ Route
+        {
+            // 1. كنجيبو السجل بـ الـ id الصحيح
+            $file = DocumentFile::with('document')->findOrFail($id);
 
-        $file = DocumentFile::with('document')->findOrFail($fileId);
+            // 2. تحويل الـ URL لـ مسار حقيقي وسط الـ Storage
+            $filePath = str_replace('/storage/', 'public/', $file->file_url);
 
-        
+            // 3. تأكيد وجود الملف فـ الـ Dossier الفيزيائي
+            if (!Storage::exists($filePath)) {
+                return response()->json(['message' => 'Fichier introuvable sur le serveur'], 404);
+            }
 
-        $filePath = str_replace('/storage/', 'public/', $file->file_url);
-
-        if (!Storage::exists($filePath)) {
-            return response()->json(['message' => 'Fichier introuvable'], 404);
+            // 4. صناعة إسم نقي ومفهوم للملف فاش ييليشارجيه الطالب
+            // مثلاً: controle_continue_numero_2_de_javascript_Exercice.pdf
+            $cleanTitle = Str::slug($file->document->titre, '_');
+            $filename = $cleanTitle . '_' . $file->file_type . '.pdf';
+            
+            // 5. تحميل الملف
+            return Storage::download($filePath, $filename);
         }
-
-        
-
-        $filename = $file->document->titre . '_' . $file->file_type . '.pdf';
-        
-        return Storage::download($filePath, $filename);
-    }
 }
 

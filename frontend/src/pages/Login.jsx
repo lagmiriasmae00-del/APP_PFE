@@ -1,45 +1,54 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { loginSuccess } from '../features/authSlice';
-import api from '../api/axios'; 
+import api from '../api/axios'; 
+
 import { useNavigate, Link } from 'react-router-dom';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false); 
+  const [loading, setLoading] = useState(false); 
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setLoading(true); 
+    setLoading(true); 
+
     
     try {
       const res = await api.post('/login', { email, password });
       dispatch(loginSuccess(res.data));
       if (res.data.user?.profile?.role === 'admin') {
-        navigate('/admin'); 
+        navigate('/admin'); 
+
       } else {
-        navigate('/dashboard'); 
+        navigate('/dashboard'); 
+
       }
     } catch (err) {
       console.error("Erreur de login complète:", err);
       
-      
+      
+
       if (!err.response) {
-        alert("🚨 مشكل ف الاتصال بالـ Backend! واش السيرفر ديال Laravel شغال ومفتوح؟ تأكدي من تشغيل 'php artisan serve'");
+        alert(" erreur de connexion : le serveur ne repond pas ");
       } 
-      
+      
+
       else if (err.response.status === 422 || err.response.status === 401) {
-        alert("❌ Email ou mot de passe incorrect.");
+        alert("Email ou mot de passe incorrect.");
       } 
-      
+      
+
       else {
-        alert(`حدث خطأ ف السيرفر: ${err.response.data.message || "Erreur serveur"}`);
+        alert(`errur: ${err.response.data.message || "Erreur serveur"}`);
       }
     } finally {
-      setLoading(false); 
+      setLoading(false); 
+
     }
   };
 
