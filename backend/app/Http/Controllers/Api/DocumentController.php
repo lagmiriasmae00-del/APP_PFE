@@ -11,16 +11,28 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use App\Models\DocumentFile;
 
-
 class DocumentController extends Controller
 {
-   public function index()
+    public function index()
     {
         $documents = Document::with(['module', 'filiere', 'files'])->orderBy('created_at', 'desc')->get();
         return response()->json($documents);
     }
 
-   public function store(Request $request)
+    public function studentIndex()
+    {
+        $user = auth()->user()->load('profile');
+        
+        $documents = Document::with(['module', 'files'])
+            ->where('filiere_id', $user->profile->filiere_id)
+            ->where('niveau', $user->profile->niveau)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json($documents);
+    }
+
+    public function store(Request $request)
     {
         $request->validate([
             'titre' => 'required|string|max:255',
@@ -110,8 +122,8 @@ class DocumentController extends Controller
             $path = $file->storeAs('documents', $fileName, 'public');
 
             foreach ($document->files as $oldFile) {
-                $filePath = str_replace('/storage/', 'public/', $oldFile->file_url);
-                Storage::delete($filePath);
+                $filePath = str_replace('/storage/', '', $oldFile->file_url);
+                Storage::disk('public')->delete($filePath);
                 $oldFile->delete();
             }
 
@@ -141,9 +153,10 @@ class DocumentController extends Controller
         }
 
         foreach ($document->files as $file) {
-            $filePath = str_replace('/storage/', 'public/', $file->file_url);
-            Storage::delete($filePath);
-            $file->delete();
+            // حل التعارض الأول: استخدام disk('public') لحذف الملف بأمان
+            $filePath = str_replace('/storage/', '', $file->file_url);
+            Storage::disk('public')->delete($filePath);
+            $file->delete(); 
         }
         
         $document->delete();
@@ -151,30 +164,24 @@ class DocumentController extends Controller
         return response()->json(['message' => 'Document et ses fichiers supprimés avec succès']);
     }
     
-
     /**
      * Download a specific document file
      */
     public function downloadFile($id)
     {
-        // 1. Get the file record by id
         $file = DocumentFile::with('document')->findOrFail($id);
 
-        // 2. Convert URL to physical path in storage
-        $filePath = str_replace('/storage/', 'public/', $file->file_url);
+        // حل التعارض الثاني: تنظيف المسار ليتوافق مع قرص public
+        $filePath = str_replace('/storage/', '', $file->file_url);
 
-        // 3. Confirm file existence
-        if (!Storage::exists($filePath)) {
+        if (!Storage::disk('public')->exists($filePath)) {
             return response()->json(['message' => 'Fichier introuvable sur le serveur'], 404);
         }
 
-        // 4. Generate a clean filename for download
+        // حل التعارض الثالث: دمج ميزة التسمية النظيفة (slug) مع التحميل عبر القرص المخصص
         $cleanTitle = Str::slug($file->document->titre, '_');
         $filename = $cleanTitle . '_' . $file->file_type . '.pdf';
         
-        // 5. Return download response
-        return Storage::download($filePath, $filename);
+        return Storage::disk('public')->download($filePath, $filename);
     }
 }
-
-
