@@ -23,6 +23,10 @@ class QuizController extends Controller
     public function index(): JsonResponse
     {
         $user = auth()->user()->load('profile');
+        if (!$user->profile) {
+            return response()->json(['error' => 'Profile not found'], 404);
+        }
+
         $filiere_id = $user->profile->filiere_id;
         $niveau = $user->profile->niveau;
 
@@ -62,6 +66,10 @@ class QuizController extends Controller
                 $quiz = Quizze::with('questions.choices', 'module')
                     ->findOrFail($quizId);
 
+
+                if (!$user->profile) {
+                    return response()->json(['error' => 'Profile not found'], 404);
+                }
 
                 if ($quiz->module->filiere_id !== $user->profile->filiere_id ||
                     $quiz->module->niveau !== $user->profile->niveau) {

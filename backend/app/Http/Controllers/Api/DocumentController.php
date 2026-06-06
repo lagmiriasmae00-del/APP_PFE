@@ -13,16 +13,26 @@ use App\Models\DocumentFile;
 
 class DocumentController extends Controller
 {
+    /**
+     * Display a listing of all documents (Admin).
+     */
     public function index()
     {
         $documents = Document::with(['module', 'filiere', 'files'])->orderBy('created_at', 'desc')->get();
         return response()->json($documents);
     }
 
+    /**
+     * Display a listing of documents for the authenticated student.
+     */
     public function studentIndex()
     {
         $user = auth()->user()->load('profile');
-        
+
+        if (!$user->profile) {
+            return response()->json(['error' => 'Profile not found'], 404);
+        }
+
         $documents = Document::with(['module', 'files'])
             ->where('filiere_id', $user->profile->filiere_id)
             ->where('niveau', $user->profile->niveau)
@@ -32,6 +42,9 @@ class DocumentController extends Controller
         return response()->json($documents);
     }
 
+    /**
+     * Store a newly created document in storage.
+     */
     public function store(Request $request)
     {
         $request->validate([

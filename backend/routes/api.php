@@ -93,6 +93,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
 
-Route::get('/filieres', function () {
-    return response()->json(Filiere::all());
+Route::middleware('throttle:10,1')->get('/filieres', function () {
+    return response()->json(App\Models\Filiere::all());
 });

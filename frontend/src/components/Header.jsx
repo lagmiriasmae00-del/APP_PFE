@@ -14,6 +14,7 @@ import {
   HelpCircle,
   LogOut 
 } from 'lucide-react';
+
 const Header = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -28,13 +29,11 @@ const Header = () => {
     }
   };
 
-  
   const activeStyle = ({ isActive }) => 
     `text-sm font-medium flex items-center gap-1.5 transition-colors ${
       isActive ? 'text-blue-600 font-bold' : 'text-gray-500 hover:text-blue-600'
     }`;
 
-  
   const adminActiveStyle = ({ isActive }) => 
     `text-xs font-normal flex items-center gap-1.5 transition-colors ${
       isActive ? 'text-blue-600 font-bold' : 'text-gray-700 hover:text-blue-600'
@@ -43,25 +42,22 @@ const Header = () => {
   return (
     <nav className="flex justify-between items-center p-4 bg-white border-b shadow-sm sticky top-0 z-50 h-16">
       
-      {}
+      {/* Logo */}
       <div className="logo font-bold text-blue-600 text-2xl tracking-tight">EduLink</div>
       
-      {}
+      {/* Navigation Links */}
       <div className="links space-x-6 flex items-center">
         
-        {}
-        <NavLink to="/" end className={activeStyle}> {}
+        <NavLink to="/" end className={activeStyle}> 
           <Home className="w-4 h-4" /> 
           <span>Accueil</span>
         </NavLink>
         
-        {}
         <NavLink to="/about" className={activeStyle}>
           <Info className="w-4 h-4" /> 
           <span>À propos</span>
         </NavLink>
         
-        {}
         {isAuthenticated && !isAdmin && (
           <>
             <NavLink to="/dashboard" className={activeStyle}>
@@ -75,10 +71,8 @@ const Header = () => {
           </>
         )}
 
-        {}
         {isAdmin && (
           <div className="flex items-center space-x-4 border-l pl-4 border-gray-200">
-            {}
             <NavLink to="/admin" end className={adminActiveStyle}>
               <LayoutDashboard className="w-3.5 h-3.5" /> <span>Dashboard</span>
             </NavLink>
@@ -110,7 +104,7 @@ const Header = () => {
         )}
       </div>
 
-      {}
+      {/* Auth Buttons / Profile info */}
       <div className="auth-buttons flex items-center gap-3">
         {!isAuthenticated ? (
           <>
@@ -118,6 +112,7 @@ const Header = () => {
             <Link to="/register" className="bg-blue-600 text-white px-4 py-2 rounded-full text-xs font-normal hover:bg-blue-700 transition">S'inscrire</Link>
           </>
         ) : (
+          <>
             {/* User information */}
             <span className="text-xs bg-slate-100 text-slate-700 px-3 py-1.5 rounded-lg font-normal border border-slate-200">
               {user?.name} <span className="text-blue-600 text-[10px] ml-1 uppercase bg-blue-50 px-1 py-0.5 rounded">({user?.profile?.role || 'stagiaire'})</span>
@@ -132,7 +127,7 @@ const Header = () => {
               <LogOut className="w-3.5 h-3.5" />
               <span>Déconnexion</span>
             </button>
-          </div>
+          </>
         )}
       </div>
     </nav>

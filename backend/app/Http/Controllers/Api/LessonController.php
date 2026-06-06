@@ -23,6 +23,10 @@ class LessonController extends Controller
     public function index(): JsonResponse
     {
         $user = auth()->user()->load('profile');
+        if (!$user->profile) {
+            return response()->json(['error' => 'Profile not found'], 404);
+        }
+
         $filiere_id = $user->profile->filiere_id;
         $niveau = $user->profile->niveau;
 
