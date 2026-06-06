@@ -139,7 +139,7 @@ class AuthController extends Controller
         if ($user->profile && $user->profile->role === 'admin') {
             $stats = [
                 'modules_total'     => Module::count(),
-                'quizzes_completed' => Result::count(), 
+                'quizzes_completed' => Result::count(),
                 'exams_total'       => Document::count(),
                 'user_name'         => $user->profile->nom . ' ' . $user->profile->prenom
             ];

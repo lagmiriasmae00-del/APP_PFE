@@ -37,10 +37,6 @@ class LessonController extends Controller
     public function show($id): JsonResponse
     {
         $lesson = Lesson::with(['module', 'videos'])->findOrFail($id);
-        
-        
-
-        
         return response()->json($lesson);
     }
 

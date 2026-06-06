@@ -1,6 +1,7 @@
 import React from 'react';
 import { NavLink, Link, useNavigate } from 'react-router-dom'; 
-import { useSelector } from 'react-redux'; 
+import { useSelector, useDispatch } from 'react-redux'; 
+import { logout } from '../features/authSlice';
 import { 
   Home,        
   Info,        
@@ -13,18 +14,17 @@ import {
   HelpCircle,
   LogOut 
 } from 'lucide-react';
-
 const Header = () => {
-  const { isAuthenticated, user } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { isAuthenticated, user } = useSelector((state) => state.auth);
 
   const isAdmin = isAuthenticated && user?.profile?.role === 'admin';
 
   const handleLogout = () => {
     if (window.confirm("Voulez-vous vraiment vous déconnecter ?")) {
-      localStorage.clear();
-      sessionStorage.clear();
-      window.location.href = '/login';
+      dispatch(logout());
+      navigate('/login');
     }
   };
 
@@ -118,13 +118,12 @@ const Header = () => {
             <Link to="/register" className="bg-blue-600 text-white px-4 py-2 rounded-full text-xs font-normal hover:bg-blue-700 transition">S'inscrire</Link>
           </>
         ) : (
-          <div className="flex items-center gap-3">
-            {/* معلومات الـ User المتصل */}
+            {/* User information */}
             <span className="text-xs bg-slate-100 text-slate-700 px-3 py-1.5 rounded-lg font-normal border border-slate-200">
               {user?.name} <span className="text-blue-600 text-[10px] ml-1 uppercase bg-blue-50 px-1 py-0.5 rounded">({user?.profile?.role || 'stagiaire'})</span>
             </span>
 
-            {/* زر تسجيل الخروج */}
+            {/* Logout button */}
             <button
               onClick={handleLogout}
               className="flex items-center gap-1 bg-red-50 hover:bg-red-100 text-red-600 px-3 py-1.5 rounded-lg text-xs font-medium border border-red-200 transition-all duration-200 cursor-pointer"
