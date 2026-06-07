@@ -4,16 +4,17 @@ import { Link } from 'react-router-dom';
 const About = () => {
   return (
     <div className="bg-white">
-      {}
+      
       <section className="bg-blue-600 py-20 text-white">
         <div className="container mx-auto px-6 text-center">
           <h1 className="text-4xl md:text-5xl font-extrabold mb-4">À propos d'EduLink</h1>
           <p className="text-blue-100 text-lg max-w-2xl mx-auto">
-            Nous croyons que l'éducation de haute qualité doit être accessible à chaque étudiant et stagiaire au Maroc, à tout moment et en tout lieu.</p>
+            Nous croyons que l'éducation de haute qualité doit être accessible à chaque étudiant et stagiaire au Maroc, à tout moment et en tout lieu.
+          </p>
         </div>
       </section>
 
-     
+      
       <section className="container mx-auto px-6 py-16 md:py-24">
         <div className="flex flex-col md:flex-row items-center gap-16">
           <div className="md:w-1/2">
@@ -28,7 +29,8 @@ const About = () => {
               Notre Mission : Accompagner votre réussite
             </h2>
             <p className="text-gray-600 leading-relaxed text-lg">
-              EduLink est une plateforme éducative numérique conçue spécifiquement pour les étudiants de la formation professionnelle. Notre objectif est de simplifier le processus d'apprentissage en fournissant un contenu structuré, des cours complets et des examens blancs pour vous aider à excellere dans les EFM et les examens nationaux.</p>
+              EduLink est une plateforme éducative numérique conçue spécifiquement pour les étudiants de la formation professionnelle. Notre objective est de simplifier le processus d'apprentissage en fournissant un contenu structuré, des cours complets et des examens blancs pour vous aider à exceller dans les EFM et les examens nationaux.
+            </p>
             <div className="space-y-4">
               <div className="flex items-start gap-3">
                 <span className="text-green-500 font-bold">✓</span>
@@ -47,7 +49,7 @@ const About = () => {
         </div>
       </section>
 
-     
+      
       <section className="bg-gray-50 py-16">
         <div className="container mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
           <div>
@@ -60,16 +62,16 @@ const About = () => {
           </div>
           <div>
             <h3 className="text-4xl font-bold text-blue-600 mb-2">100%</h3>
-            <p className="text-gray-500 font-medium text-sm">Gratuit</p>
+            <p className="text-gray-500 font-medium text-sm">Accès Libre</p>
           </div>
           <div>
             <h3 className="text-4xl font-bold text-blue-600 mb-2">24/7</h3>
-            <p className="text-gray-500 font-medium text-sm">Accessibilité</p>
+            <p className="text-gray-500 font-medium text-sm">Flexibilité Totale</p>
           </div>
         </div>
       </section>
 
-      {/* 4. Call to Action - دعوة للتسجيل */}
+      
       <section className="container mx-auto px-6 py-20 text-center">
         <div className="bg-blue-600 rounded-3xl p-10 md:p-16 text-white shadow-2xl">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">Prêt à booster vos compétences ?</h2>

@@ -23,6 +23,10 @@ class QuizController extends Controller
     public function index(): JsonResponse
     {
         $user = auth()->user()->load('profile');
+        if (!$user->profile) {
+            return response()->json(['error' => 'Profile not found'], 404);
+        }
+
         $filiere_id = $user->profile->filiere_id;
         $niveau = $user->profile->niveau;
 
@@ -37,10 +41,6 @@ class QuizController extends Controller
     public function show($id): JsonResponse
     {
         $quiz = Quizze::with(['module', 'questions.choices'])->findOrFail($id);
-        
-        
-
-        
         return response()->json($quiz);
     }
 
@@ -62,12 +62,14 @@ class QuizController extends Controller
                 $totalQuestions = 0;
                 $correctAnswersCount = 0;
 
-                
 
                 $quiz = Quizze::with('questions.choices', 'module')
                     ->findOrFail($quizId);
 
-                
+
+                if (!$user->profile) {
+                    return response()->json(['error' => 'Profile not found'], 404);
+                }
 
                 if ($quiz->module->filiere_id !== $user->profile->filiere_id ||
                     $quiz->module->niveau !== $user->profile->niveau) {
@@ -91,13 +93,11 @@ class QuizController extends Controller
                     $submittedChoiceId = $validated['answers'][$question->id] ?? null;
 
                     if ($submittedChoiceId) {
-                        
 
                         $choice = Choice::where('id', $submittedChoiceId)
                                        ->where('question_id', $question->id)
                                        ->firstOrFail();
 
-                        
 
                         UserReponse::create([
                             'user_id' => $user->id,

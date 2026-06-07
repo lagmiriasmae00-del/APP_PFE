@@ -101,7 +101,17 @@ class AuthController extends Controller
     {
         $user = auth()->user()->load('profile');
 
-        if ($user->profile && $user->profile->role === 'admin') {
+        if (!$user->profile) {
+            return response()->json([
+                'modules_total' => 0,
+                'quizzes_completed' => 0,
+                'exams_total' => 0,
+                'user_name' => $user->name,
+                'error' => 'Profil non trouvé'
+            ]);
+        }
+
+        if ($user->profile->role === 'admin') {
             $stats = [
                 'modules_total'     => Module::count(),
                 'quizzes_completed' => Result::count(),

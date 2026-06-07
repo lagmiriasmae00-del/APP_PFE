@@ -21,7 +21,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/dashboard-stats', [AuthController::class, 'getStats']);
 
     Route::middleware('role:stagiaire,admin')->group(function () {
-        Route::get('/my-modules', [ModuleController::class, 'index']);
+        Route::get('/my-modules', [ModuleController::class, 'index']); 
+        Route::get('/my-documents', [DocumentController::class, 'studentIndex']); 
+
         Route::get('/module/{id}', [ModuleController::class, 'show']);
         Route::get('/lessons/{id}', [LessonController::class, 'show']);
         Route::get('/quizzes/{id}', [QuizController::class, 'show']);
@@ -60,6 +62,6 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 });
 
-Route::get('/filieres', function () {
+Route::middleware('throttle:10,1')->get('/filieres', function () {
     return response()->json(Filiere::all());
 });

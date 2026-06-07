@@ -23,9 +23,9 @@ const Home = () => {
 
         </div>
 
-        {/* الصورة - Right Side */}
+        
         <div className="md:w-1/2 relative">
-          {/* الخلفية الزرقاء اللي ورا التصويرة */}
+          
           <div className="absolute inset-0 bg-blue-100 rounded-3xl rotate-3 scale-105 -z-10"></div>
           <img 
             src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 

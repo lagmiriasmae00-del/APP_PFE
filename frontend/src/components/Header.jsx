@@ -1,9 +1,10 @@
 import React from 'react';
-import { NavLink, Link, useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { NavLink, Link, useNavigate } from 'react-router-dom'; 
+import { useSelector, useDispatch } from 'react-redux'; 
+import { logout } from '../features/authSlice';
 import { 
-  Home, 
-  Info, 
+  Home,        
+  Info,        
   LayoutDashboard, 
   BookOpen, 
   GraduationCap, 
@@ -15,16 +16,16 @@ import {
 } from 'lucide-react';
 
 const Header = () => {
-  const { isAuthenticated, user } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { isAuthenticated, user } = useSelector((state) => state.auth);
 
   const isAdmin = isAuthenticated && user?.profile?.role === 'admin';
 
   const handleLogout = () => {
     if (window.confirm("Voulez-vous vraiment vous déconnecter ?")) {
-      localStorage.clear();
-      sessionStorage.clear();
-      window.location.href = '/login';
+      dispatch(logout());
+      navigate('/login');
     }
   };
 
@@ -40,10 +41,14 @@ const Header = () => {
 
   return (
     <nav className="flex justify-between items-center p-4 bg-white border-b shadow-sm sticky top-0 z-50 h-16">
+      
+      {/* Logo */}
       <div className="logo font-bold text-blue-600 text-2xl tracking-tight">EduLink</div>
       
+      {/* Navigation Links */}
       <div className="links space-x-6 flex items-center">
-        <NavLink to="/" end className={activeStyle}>
+        
+        <NavLink to="/" end className={activeStyle}> 
           <Home className="w-4 h-4" /> 
           <span>Accueil</span>
         </NavLink>
@@ -99,6 +104,7 @@ const Header = () => {
         )}
       </div>
 
+      {/* Auth Buttons / Profile info */}
       <div className="auth-buttons flex items-center gap-3">
         {!isAuthenticated ? (
           <>
@@ -106,11 +112,13 @@ const Header = () => {
             <Link to="/register" className="bg-blue-600 text-white px-4 py-2 rounded-full text-xs font-normal hover:bg-blue-700 transition">S'inscrire</Link>
           </>
         ) : (
-          <div className="flex items-center gap-3">
+          <>
+            {/* User information */}
             <span className="text-xs bg-slate-100 text-slate-700 px-3 py-1.5 rounded-lg font-normal border border-slate-200">
               {user?.name} <span className="text-blue-600 text-[10px] ml-1 uppercase bg-blue-50 px-1 py-0.5 rounded">({user?.profile?.role || 'stagiaire'})</span>
             </span>
 
+            {/* Logout button */}
             <button
               onClick={handleLogout}
               className="flex items-center gap-1 bg-red-50 hover:bg-red-100 text-red-600 px-3 py-1.5 rounded-lg text-xs font-medium border border-red-200 transition-all duration-200 cursor-pointer"
@@ -119,7 +127,7 @@ const Header = () => {
               <LogOut className="w-3.5 h-3.5" />
               <span>Déconnexion</span>
             </button>
-          </div>
+          </>
         )}
       </div>
     </nav>

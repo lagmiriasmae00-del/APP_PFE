@@ -101,7 +101,6 @@ const Register = () => {
             </div>
           </div>
 
-          {/* 🌟 السطر 2: Username & Email فـ نفس السطر باش نربحو المساحة وندمروا الـ Scroll */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Nom d'utilisateur</label>

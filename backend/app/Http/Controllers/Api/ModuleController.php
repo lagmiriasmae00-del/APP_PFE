@@ -20,7 +20,11 @@ class ModuleController extends Controller
     public function index(): JsonResponse
     {
         $user = auth()->user()->load('profile');
-        
+
+        if (!$user->profile) {
+            return response()->json(['error' => 'Profile not found'], 404);
+        }
+
         $modules = Module::where('filiere_id', $user->profile->filiere_id)
                     ->where('niveau', $user->profile->niveau)
                     ->with(['filiere', 'quizzes', 'lessons'])
@@ -39,8 +43,11 @@ class ModuleController extends Controller
         $module = Module::with(['filiere', 'quizzes.questions', 'lessons.videos', 'documents.files'])->findOrFail($id);
 
         if (!$isAdmin) {
-            $filiere_id = $user->profile ? $user->profile->filiere_id : null;
-            $niveau = $user->profile ? $user->profile->niveau : null;
+            if (!$user->profile) {
+                return response()->json(['error' => 'Profile not found'], 404);
+            }
+            $filiere_id = $user->profile->filiere_id;
+            $niveau = $user->profile->niveau;
 
             if ($module->filiere_id !== $filiere_id || $module->niveau !== $niveau) {
                 return response()->json(['error' => 'Access denied'], 403);

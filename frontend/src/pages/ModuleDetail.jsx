@@ -3,7 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import api from '../api/axios';
 
 
-import { BookOpen, HelpCircle, FileText, ArrowRight, GraduationCap, ChevronRight, Loader2 } from 'lucide-react';
+import { BookOpen, HelpCircle, FileText, ArrowRight, GraduationCap, ChevronRight, Loader2, Eye } from 'lucide-react';
 
 
 
@@ -154,6 +154,7 @@ const QuizCard = ({ quizzes = [] }) => {
 
 const DocumentsCard = ({ documents = [] }) => {
   const [downloading, setDownloading] = useState(null);
+  const [viewing, setViewing] = useState(null);
 
   const handleDownload = async (fileId, fileName) => {
     setDownloading(fileId);
@@ -175,10 +176,24 @@ const DocumentsCard = ({ documents = [] }) => {
     }
   };
 
+  const handleView = async (fileId) => {
+    setViewing(fileId);
+    try {
+      const response = await api.get(`/files/${fileId}/download`, { responseType: 'blob' });
+      const file = new Blob([response.data], { type: 'application/pdf' });
+      const fileURL = URL.createObjectURL(file);
+      window.open(fileURL, '_blank');
+    } catch {
+      alert('Erreur lors de l\'ouverture du fichier.');
+    } finally {
+      setViewing(null);
+    }
+  };
+
   return (
     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition duration-200 p-6 flex flex-col justify-between min-h-[250px]">
       <div>
-        {}
+        {/* En-tête */}
         <div className="flex items-center justify-between">
           <div className="p-3 bg-emerald-50 text-emerald-600 rounded-xl">
             <FileText className="w-6 h-6" />
@@ -188,13 +203,13 @@ const DocumentsCard = ({ documents = [] }) => {
           </span>
         </div>
 
-        {}
+        {/* Titre */}
         <div className="mt-4">
           <h3 className="text-lg font-bold text-gray-950 tracking-tight">Supports & EFM</h3>
           <p className="text-gray-400 text-xs mt-1">Documents téléchargeables</p>
         </div>
 
-        {}
+        {/* Liste */}
         {documents.length > 0 && (
           <div className="mt-4 space-y-2 max-h-[180px] overflow-y-auto pr-1">
             {documents.map((doc) => (
@@ -207,13 +222,24 @@ const DocumentsCard = ({ documents = [] }) => {
                   <p className="text-[10px] text-gray-400 font-medium mt-0.5">{doc.type || 'Support'}</p>
                 </div>
                 {doc.files?.[0] && (
-                  <button
-                    disabled={downloading === doc.files[0].id}
-                    onClick={() => handleDownload(doc.files[0].id, doc.titre)}
-                    className="shrink-0 bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-200 text-white text-[10px] font-bold px-2.5 py-1.5 rounded-md transition disabled:cursor-not-allowed"
-                  >
-                    {downloading === doc.files[0].id ? <Loader2 className="w-3 h-3 animate-spin" /> : '⬇'}
-                  </button>
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <button
+                      disabled={viewing === doc.files[0].id}
+                      onClick={() => handleView(doc.files[0].id)}
+                      className="bg-blue-100 hover:bg-blue-200 disabled:bg-gray-200 text-blue-600 text-[10px] font-bold px-2 py-1.5 rounded-md transition disabled:cursor-not-allowed flex items-center justify-center"
+                      title="Ouvrir le document"
+                    >
+                      {viewing === doc.files[0].id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                    <button
+                      disabled={downloading === doc.files[0].id}
+                      onClick={() => handleDownload(doc.files[0].id, doc.titre)}
+                      className="bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-200 text-white text-[10px] font-bold px-2 py-1.5 rounded-md transition disabled:cursor-not-allowed flex items-center justify-center"
+                      title="Télécharger le document"
+                    >
+                      {downloading === doc.files[0].id ? <Loader2 className="w-4 h-4 animate-spin" /> : '⬇'}
+                    </button>
+                  </div>
                 )}
               </div>
             ))}

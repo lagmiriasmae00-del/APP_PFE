@@ -13,12 +13,38 @@ use App\Models\DocumentFile;
 
 class DocumentController extends Controller
 {
+    /**
+     * Display a listing of all documents (Admin).
+     */
     public function index()
     {
         $documents = Document::with(['module', 'filiere', 'files'])->orderBy('created_at', 'desc')->get();
         return response()->json($documents);
     }
 
+    /**
+     * Display a listing of documents for the authenticated student.
+     */
+    public function studentIndex()
+    {
+        $user = auth()->user()->load('profile');
+
+        if (!$user->profile) {
+            return response()->json(['error' => 'Profile not found'], 404);
+        }
+
+        $documents = Document::with(['module', 'files'])
+            ->where('filiere_id', $user->profile->filiere_id)
+            ->where('niveau', $user->profile->niveau)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json($documents);
+    }
+
+    /**
+     * Store a newly created document in storage.
+     */
     public function store(Request $request)
     {
         $request->validate([
@@ -37,7 +63,7 @@ class DocumentController extends Controller
         }
 
         $file = $request->file('file');
-        
+
         $finfo = finfo_open(FILEINFO_MIME_TYPE);
         $mimeType = finfo_file($finfo, $file->getRealPath());
         finfo_close($finfo);
@@ -58,14 +84,14 @@ class DocumentController extends Controller
             'module_id' => $request->module_id,
         ]);
 
-        DocumentFile::create([
+        $documentFile = DocumentFile::create([
             'file_url' => '/storage/' . $path,
             'file_type' => $request->file_type,
             'document_id' => $document->id
         ]);
 
         return response()->json([
-            'message' => 'Document et fichier créés avec succès',
+            'message' => 'Document and file created successfully',
             'document' => $document->load('files')
         ], 201);
     }
@@ -126,7 +152,7 @@ class DocumentController extends Controller
         }
 
         return response()->json([
-            'message' => 'Document modifié avec succès',
+            'message' => 'Document updated successfully',
             'document' => $document->load('files')
         ], 200);
     }
@@ -142,21 +168,24 @@ class DocumentController extends Controller
         foreach ($document->files as $file) {
             $filePath = str_replace('/storage/', '', $file->file_url);
             Storage::disk('public')->delete($filePath);
-            $file->delete();
+            $file->delete(); 
         }
-
+        
         $document->delete();
 
         return response()->json(['message' => 'Document et ses fichiers supprimés avec succès']);
     }
-
-    public function downloadFile($fileId)
+    
+    /**
+     * Download a specific document file
+     */
+    public function downloadFile($id)
     {
-        $file = DocumentFile::with('document')->findOrFail($fileId);
+        $file = DocumentFile::with('document')->findOrFail($id);
         $filePath = str_replace('/storage/', '', $file->file_url);
 
         if (!Storage::disk('public')->exists($filePath)) {
-            return response()->json(['message' => 'Fichier introuvable'], 404);
+            return response()->json(['message' => 'Fichier introuvable sur le serveur'], 404);
         }
 
         $cleanTitle = Str::slug($file->document->titre, '_');
