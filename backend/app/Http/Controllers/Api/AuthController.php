@@ -30,15 +30,11 @@ class AuthController extends Controller
         ]);
 
         try {
-            
-
             $user = User::create([
                 'name' => $validated['name'],
                 'email' => $validated['email'],
                 'password' => Hash::make($validated['password']),
             ]);
-
-            
 
             $user->profile()->create([
                 'nom' => $validated['nom'],
@@ -48,15 +44,9 @@ class AuthController extends Controller
                 'filiere_id' => $validated['filiere_id'],
             ]);
 
-            
-
             $token = $user->createToken('auth_token')->plainTextToken;
 
-            Log::info('User registered', [
-                'user_id' => $user->id,
-                'email' => $user->email,
-                'ip' => request()->ip()
-            ]);
+            Log::info('User registered', ['user_id' => $user->id, 'email' => $user->email]);
 
             return response()->json([
                 'access_token' => $token,
@@ -64,14 +54,8 @@ class AuthController extends Controller
                 'user' => $user->load('profile')
             ], 201);
         } catch (\Exception $e) {
-            Log::error('Registration error', [
-                'email' => $validated['email'] ?? null,
-                'error' => $e->getMessage()
-            ]);
-
-            return response()->json([
-                'error' => 'Registration failed'
-            ], 500);
+            Log::error('Registration error', ['error' => $e->getMessage()]);
+            return response()->json(['error' => 'Registration failed'], 500);
         }
     }
 
@@ -82,32 +66,17 @@ class AuthController extends Controller
             'password' => 'required|string'
         ]);
 
-        
-
         $user = User::where('email', $validated['email'])->first();
 
-        
-
         if (!$user || !Hash::check($validated['password'], $user->password)) {
-            Log::warning('Failed login attempt', [
-                'email' => $validated['email'],
-                'ip' => request()->ip()
-            ]);
-
-            throw ValidationException::withMessages([
-                'email' => 'Email ou mot de passe incorrect.',
-            ]);
+            Log::warning('Failed login attempt', ['email' => $validated['email']]);
+            throw ValidationException::withMessages(['email' => 'Email ou mot de passe incorrect.']);
         }
-
-        
 
         $user->tokens()->delete();
         $token = $user->createToken('auth_token')->plainTextToken;
 
-        Log::info('User logged in', [
-            'user_id' => $user->id,
-            'ip' => request()->ip()
-        ]);
+        Log::info('User logged in', ['user_id' => $user->id]);
 
         return response()->json([
             'access_token' => $token,
@@ -124,11 +93,7 @@ class AuthController extends Controller
     public function logout(): JsonResponse
     {
         auth()->user()->tokens()->delete();
-        
-        Log::info('User logged out', [
-            'user_id' => auth()->id()
-        ]);
-
+        Log::info('User logged out', ['user_id' => auth()->id()]);
         return response()->json(['message' => 'Logged out successfully']);
     }
 
@@ -139,7 +104,7 @@ class AuthController extends Controller
         if ($user->profile && $user->profile->role === 'admin') {
             $stats = [
                 'modules_total'     => Module::count(),
-                'quizzes_completed' => Result::count(), 
+                'quizzes_completed' => Result::count(),
                 'exams_total'       => Document::count(),
                 'user_name'         => $user->profile->nom . ' ' . $user->profile->prenom
             ];
@@ -170,22 +135,14 @@ class AuthController extends Controller
     {
         $user = User::findOrFail($id);
 
-        
-
         if (auth()->id() === $id) {
-            return response()->json([
-                'error' => 'Cannot delete your own account'
-            ], 422);
+            return response()->json(['error' => 'Cannot delete your own account'], 422);
         }
 
         $email = $user->email;
         $user->delete();
 
-        Log::warning('User deleted', [
-            'deleted_user_id' => $id,
-            'deleted_email' => $email,
-            'admin_id' => auth()->id()
-        ]);
+        Log::warning('User deleted', ['deleted_user_id' => $id, 'admin_id' => auth()->id()]);
 
         return response()->json(['message' => 'Utilisateur supprimé avec succès']);
     }

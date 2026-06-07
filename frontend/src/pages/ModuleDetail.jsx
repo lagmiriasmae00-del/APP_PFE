@@ -162,7 +162,8 @@ const DocumentsCard = ({ documents = [] }) => {
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', `${fileName}.pdf`);
+      const sanitizedFileName = fileName.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+      link.setAttribute('download', `${sanitizedFileName}.pdf`);
       document.body.appendChild(link);
       link.click();
       link.parentNode.removeChild(link);

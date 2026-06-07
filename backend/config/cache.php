@@ -84,4 +84,10 @@ return [
 
     'prefix' => env('CACHE_PREFIX', Str::slug((string) env('APP_NAME', 'laravel')).'-cache-'),
 
+    'rate_limit' => [
+        'auth' => '5,1',
+        'api' => '60,1',
+        'password' => '3,60',
+    ],
+
 ];

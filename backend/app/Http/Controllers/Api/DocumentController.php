@@ -13,16 +13,14 @@ use App\Models\DocumentFile;
 
 class DocumentController extends Controller
 {
-   public function index()
+    public function index()
     {
         $documents = Document::with(['module', 'filiere', 'files'])->orderBy('created_at', 'desc')->get();
         return response()->json($documents);
     }
 
-   public function store(Request $request)
+    public function store(Request $request)
     {
-        
-
         $request->validate([
             'titre' => 'required|string|max:255',
             'type' => 'required|in:cc,regional,efm',
@@ -30,10 +28,8 @@ class DocumentController extends Controller
             'year' => 'required|integer',
             'filiere_id' => 'required|exists:filieres,id',
             'module_id' => 'required|exists:modules,id',
-            'file' => 'required|file|mimes:pdf|max:10240', 
-
-            'file_type' => 'required|string|in:Exercice,Correction,Cours' 
-
+            'file' => 'required|file|mimes:pdf|max:10240',
+            'file_type' => 'required|string|in:Exercice,Correction,Cours'
         ]);
 
         if (!$request->hasFile('file')) {
@@ -42,8 +38,6 @@ class DocumentController extends Controller
 
         $file = $request->file('file');
         
-        
-
         $finfo = finfo_open(FILEINFO_MIME_TYPE);
         $mimeType = finfo_file($finfo, $file->getRealPath());
         finfo_close($finfo);
@@ -52,14 +46,8 @@ class DocumentController extends Controller
             throw ValidationException::withMessages(['file' => 'The file must be a valid PDF']);
         }
 
-        
-
         $fileName = Str::uuid() . '.pdf';
         $path = $file->storeAs('documents', $fileName, 'public');
-
-        
-
-        
 
         $document = Document::create([
             'titre' => $request->titre,
@@ -70,13 +58,9 @@ class DocumentController extends Controller
             'module_id' => $request->module_id,
         ]);
 
-        
-
-        $documentFile = DocumentFile::create([
-            'file_url' => '/storage/' . $path, 
-
-            'file_type' => $request->file_type, 
-
+        DocumentFile::create([
+            'file_url' => '/storage/' . $path,
+            'file_type' => $request->file_type,
             'document_id' => $document->id
         ]);
 
@@ -97,8 +81,8 @@ class DocumentController extends Controller
             'year' => 'required|integer',
             'filiere_id' => 'required|exists:filieres,id',
             'module_id' => 'required|exists:modules,id',
-            'file' => 'nullable|file|mimes:pdf|max:10240', 
-            'file_type' => 'required|string|in:Exercice,Correction,Cours' 
+            'file' => 'nullable|file|mimes:pdf|max:10240',
+            'file_type' => 'required|string|in:Exercice,Correction,Cours'
         ]);
 
         $document->update([
@@ -125,14 +109,14 @@ class DocumentController extends Controller
             $path = $file->storeAs('documents', $fileName, 'public');
 
             foreach ($document->files as $oldFile) {
-                $filePath = str_replace('/storage/', 'public/', $oldFile->file_url);
-                Storage::delete($filePath);
+                $filePath = str_replace('/storage/', '', $oldFile->file_url);
+                Storage::disk('public')->delete($filePath);
                 $oldFile->delete();
             }
 
             DocumentFile::create([
-                'file_url' => '/storage/' . $path, 
-                'file_type' => $request->file_type, 
+                'file_url' => '/storage/' . $path,
+                'file_type' => $request->file_type,
                 'document_id' => $document->id
             ]);
         } else {
@@ -155,42 +139,29 @@ class DocumentController extends Controller
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
-        
-
         foreach ($document->files as $file) {
-            $filePath = str_replace('/storage/', 'public/', $file->file_url);
-            Storage::delete($filePath);
-            $file->delete(); 
-
+            $filePath = str_replace('/storage/', '', $file->file_url);
+            Storage::disk('public')->delete($filePath);
+            $file->delete();
         }
-        
-        
 
         $document->delete();
 
         return response()->json(['message' => 'Document et ses fichiers supprimés avec succès']);
     }
-    
 
     public function downloadFile($fileId)
     {
-        
-
         $file = DocumentFile::with('document')->findOrFail($fileId);
+        $filePath = str_replace('/storage/', '', $file->file_url);
 
-        
-
-        $filePath = str_replace('/storage/', 'public/', $file->file_url);
-
-        if (!Storage::exists($filePath)) {
+        if (!Storage::disk('public')->exists($filePath)) {
             return response()->json(['message' => 'Fichier introuvable'], 404);
         }
 
+        $cleanTitle = Str::slug($file->document->titre, '_');
+        $filename = $cleanTitle . '_' . $file->file_type . '.pdf';
         
-
-        $filename = $file->document->titre . '_' . $file->file_type . '.pdf';
-        
-        return Storage::download($filePath, $filename);
+        return Storage::disk('public')->download($filePath, $filename);
     }
 }
-

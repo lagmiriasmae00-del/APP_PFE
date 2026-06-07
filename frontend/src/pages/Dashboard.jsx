@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import api from '../api/axios';
 import { useSelector } from 'react-redux';
 import { Link, Navigate } from 'react-router-dom';
-
 import { BookOpen, CheckCircle, FileText, Loader2, ArrowRight } from 'lucide-react';
 
 const Dashboard = () => {
@@ -19,7 +18,6 @@ const Dashboard = () => {
     return <Navigate to="/admin" replace />;
   }
 
-  
   if (!stats) return (
     <div className="min-h-screen bg-gray-50/50 flex items-center justify-center">
       <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
@@ -28,23 +26,18 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-50/50 p-4 md:p-8">
-      
-      {}
       <div className="max-w-7xl mx-auto mb-10">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl md:text-3xl font-black text-gray-900 tracking-tight">
-              Bienvenue, <span className="text-blue-600 lowercase">{stats.user_name}</span>
+              Bienvenue, <span className="text-blue-600 capitalize">{stats.user_name}</span>
             </h1>
-            <p className="text-gray-400 text-xs font-semibold mt-1">Heureux de vous revoir ! Voici un aperçu de votre progression.</p>
+            <p className="text-gray-400 text-xs font-semibold mt-1">Voici un aperçu de votre progression.</p>
           </div>
         </div>
       </div>
 
-      {}
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
-        
-        {}
         <div className="relative overflow-hidden bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-all group">
           <div className="absolute top-0 right-0 w-20 h-20 bg-blue-50 rounded-bl-full -mr-6 -mt-6 transition-all group-hover:bg-blue-100/70"></div>
           <div className="relative space-y-4">
@@ -65,7 +58,6 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {}
         <div className="relative overflow-hidden bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-all group">
           <div className="absolute top-0 right-0 w-20 h-20 bg-emerald-50 rounded-bl-full -mr-6 -mt-6 transition-all group-hover:bg-emerald-100/70"></div>
           <div className="relative space-y-4">
@@ -86,7 +78,6 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {}
         <div className="relative overflow-hidden bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-all group">
           <div className="absolute top-0 right-0 w-20 h-20 bg-amber-50 rounded-bl-full -mr-6 -mt-6 transition-all group-hover:bg-amber-100/70"></div>
           <div className="relative space-y-4">
@@ -106,7 +97,6 @@ const Dashboard = () => {
             </Link>
           </div>
         </div>
-
       </div>
     </div>
   );

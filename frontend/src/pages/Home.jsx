@@ -35,7 +35,7 @@ const Home = () => {
         </div>
       </section>
 
-      {/* 2. WHY CHOOSE US - علاش EduLink ؟ */}
+      
       <section className="bg-gray-50 py-20">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
@@ -56,7 +56,7 @@ const Home = () => {
               </p>
             </div>
 
-            {/* Card 2 */}
+            
             <div className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-md transition-shadow border border-gray-100">
               <div className="w-12 h-12 bg-purple-50 text-purple-600 rounded-lg flex items-center justify-center text-2xl mb-6">⏱️</div>
               <h3 className="font-bold text-xl mb-3 text-gray-900">Flexibilité Totale</h3>
@@ -65,7 +65,7 @@ const Home = () => {
               </p>
             </div>
 
-            {/* Card 3 */}
+            
             <div className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-md transition-shadow border border-gray-100">
               <div className="w-12 h-12 bg-orange-50 text-orange-600 rounded-lg flex items-center justify-center text-2xl mb-6">📜</div>
               <h3 className="font-bold text-xl mb-3 text-gray-900">Suivi & Examens</h3>
@@ -77,7 +77,7 @@ const Home = () => {
         </div>
       </section>
 
-      {/* 3. TESTIMONIALS - داكشي اللي كيقولو الطلبة */}
+      
       <section className="py-20 bg-white text-center">
         <h3 className="text-2xl font-bold text-gray-900 mb-4">Ce que disent nos étudiants</h3>
         <p className="text-gray-500 max-w-xl mx-auto px-6">

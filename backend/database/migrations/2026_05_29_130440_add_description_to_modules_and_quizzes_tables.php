@@ -9,16 +9,32 @@ return new class extends Migration
     
     public function up(): void
     {
-        Schema::table('modules_and_quizzes_tables', function (Blueprint $table) {
-            
-        });
+        if (Schema::hasTable('modules') && !Schema::hasColumn('modules', 'description')) {
+            Schema::table('modules', function (Blueprint $table) {
+                $table->text('description')->nullable()->after('titre');
+            });
+        }
+
+        if (Schema::hasTable('quizzes') && !Schema::hasColumn('quizzes', 'description')) {
+            Schema::table('quizzes', function (Blueprint $table) {
+                $table->text('description')->nullable()->after('titre');
+            });
+        }
     }
 
     
     public function down(): void
     {
-        Schema::table('modules_and_quizzes_tables', function (Blueprint $table) {
-            
-        });
+        if (Schema::hasTable('modules')) {
+            Schema::table('modules', function (Blueprint $table) {
+                $table->dropColumn('description');
+            });
+        }
+
+        if (Schema::hasTable('quizzes')) {
+            Schema::table('quizzes', function (Blueprint $table) {
+                $table->dropColumn('description');
+            });
+        }
     }
 };
